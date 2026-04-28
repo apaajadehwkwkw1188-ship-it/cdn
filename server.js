@@ -13,7 +13,7 @@ const upload = multer({
 });
 
 // =======================
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_TOKEN = "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";
 const GITHUB_OWNER = "apaajadehwkwkw1188-ship-it";
 const GITHUB_REPO = "cdn";
 const GITHUB_BRANCH = "main";
