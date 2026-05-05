@@ -225,12 +225,18 @@ app.get("/storage/:filename", async (req, res) => {
       responseType: "stream"
     });
 
-    if (req.query.preview === "true") {
-      res.setHeader(
-        "Content-Type",
-        mime.lookup(req.params.filename) || "application/octet-stream"
-      );
-    } else {
+    let type = mime.lookup(req.params.filename) || "application/octet-stream";
+
+    // ✅ set content type sesuai file
+    res.setHeader("Content-Type", type);
+
+    // ✅ bantu Telegram detect size
+    if (response.headers["content-length"]) {
+      res.setHeader("Content-Length", response.headers["content-length"]);
+    }
+
+    // ✅ hanya attachment kalau bukan preview
+    if (!req.query.preview) {
       res.setHeader(
         "Content-Disposition",
         `attachment; filename="${req.params.filename}"`
