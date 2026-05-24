@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PIATXPLOIT | OSINT Platform</title>
+
+<meta name="description" content="PIATXPLOIT adalah platform OSINT untuk analisis data publik, investigasi digital, dan pemantauan keamanan siber.">
+<meta name="keywords" content="OSINT, Data Breach, Intelligence, Cyber, Recon, Investigasi">
+<meta name="author" content="PIATXPLOIT">
+
+<style>
+
+body{
+  margin:0;
+  background:#040812;
+  font-family:Consolas, monospace;
+  color:#dbe2ff;
+}
+
+.wrapper{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:25px;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  background:#07101f;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:40px;
+  box-shadow:0 0 30px rgba(0,255,255,.12);
+}
+
+/* Header */
+
+.header{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.header h1{
+  color:#00f7ff;
+  font-size:2.6rem;
+  margin:0;
+}
+
+.header span{
+  display:block;
+  margin-top:5px;
+  font-size:.9rem;
+  color:#94a3b8;
+}
+
+/* Terminal */
+
+.terminal{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:6px;
+  padding:12px;
+  font-size:.85rem;
+  color:#22c55e;
+  margin-bottom:25px;
+  line-height:1.5;
+}
+
+/* Section */
+
+.section{
+  margin:28px 0;
+}
+
+.section h2{
+  font-size:1.1rem;
+  color:#38bdf8;
+  border-bottom:1px solid #1e293b;
+  padding-bottom:6px;
+  margin-bottom:10px;
+}
+
+.section p{
+  font-size:.9rem;
+  line-height:1.7;
+  margin:8px 0;
+  color:#dbe2ff;
+}
+
+/* Stats */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:15px;
+  margin-top:15px;
+}
+
+.stat{
+  background:#020617;
+  border:1px solid #1e293b;
+  padding:15px;
+  border-radius:6px;
+  text-align:center;
+}
+
+.stat h3{
+  margin:0;
+  color:#22c55e;
+  font-size:1.4rem;
+}
+
+.stat span{
+  font-size:.8rem;
+  color:#94a3b8;
+}
+
+/* List */
+
+.list p{
+  margin:5px 0;
+  font-size:.88rem;
+}
+
+/* Button */
+
+.btn{
+  display:inline-block;
+  margin-top:30px;
+  padding:12px 32px;
+  background:#00f7ff;
+  color:#000;
+  font-weight:bold;
+  text-decoration:none;
+  border-radius:6px;
+  transition:.25s;
+}
+
+.btn:hover{
+  background:#38bdf8;
+  transform:translateY(-2px);
+}
+
+/* Footer */
+
+.footer{
+  margin-top:30px;
+  text-align:center;
+  font-size:.8rem;
+  color:#64748b;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+<div class="container">
+
+<!-- HEADER -->
+
+<div class="header">
+<h1>PIATXPLOIT</h1>
+<span>Open Source Intelligence & Cyber Analysis Platform</span>
+</div>
+
+<!-- TERMINAL -->
+
+<div class="terminal">
+root@piatxploit:~$ initializing modules...<br>
+root@piatxploit:~$ loading datasets...<br>
+root@piatxploit:~$ system ready
+</div>
+
+<!-- ABOUT -->
+
+<div class="section">
+<h2>About This Platform</h2>
+
+<p>
+PIATXPLOIT dikembangkan sebagai platform OSINT
+yang berfokus pada pengolahan data publik
+dan analisis jejak digital secara terstruktur.
+Sistem ini dibangun untuk membantu proses investigasi,
+pemantauan risiko, serta riset keamanan informasi.
+</p>
+
+<p>
+Sejak awal pengembangan,
+fokus utama platform ini adalah kecepatan pencarian,
+akurasi hasil,
+dan stabilitas sistem dalam menangani permintaan
+dalam jumlah besar.
+</p>
+
+<p>
+Seluruh data yang digunakan bersumber dari
+database internal,
+arsip terbuka,
+dan integrasi API eksternal
+yang telah melalui proses validasi.
+</p>
+</div>
+
+<!-- STATS -->
+
+<div class="section">
+<h2>System Overview</h2>
+
+<div class="stats">
+
+<div class="stat">
+<h3>5TB+</h3>
+<span>Indexed Data</span>
+</div>
+
+<div class="stat">
+<h3>2M+</h3>
+<span>Monthly Queries</span>
+</div>
+
+<div class="stat">
+<h3>180+</h3>
+<span>Data Sources</span>
+</div>
+
+<div class="stat">
+<h3>99.8%</h3>
+<span>Availability</span>
+</div>
+
+<div class="stat">
+<h3>&lt;900ms</h3>
+<span>Avg Response</span>
+</div>
+
+<div class="stat">
+<h3>24/7</h3>
+<span>Monitoring</span>
+</div>
+
+</div>
+</div>
+
+<!-- FEATURES -->
+
+<div class="section">
+<h2>Main Capabilities</h2>
+
+<div class="list">
+<p>• Analisis nomor telepon dan email</p>
+<p>• Deteksi indikasi kebocoran data</p>
+<p>• Pemetaan identitas digital</p>
+<p>• Korelasi multi-sumber</p>
+<p>• Pencarian arsip historis</p>
+<p>• Integrasi API internal</p>
+<p>• Sistem logging dan audit</p>
+</div>
+
+</div>
+
+<!-- USE CASE -->
+
+<div class="section">
+<h2>Applications</h2>
+
+<div class="list">
+<p>• Investigasi keamanan siber</p>
+<p>• Digital forensics</p>
+<p>• Analisis penipuan</p>
+<p>• OSINT research</p>
+<p>• Audit sistem informasi</p>
+<p>• Threat assessment</p>
+</div>
+
+</div>
+
+<!-- SECURITY -->
+
+<div class="section">
+<h2>Security Approach</h2>
+
+<p>
+PIATXPLOIT menerapkan sistem autentikasi berlapis,
+enkripsi komunikasi,
+serta pembatasan akses berbasis peran.
+Seluruh aktivitas tercatat dalam audit log
+untuk menjaga transparansi sistem.
+</p>
+
+<p>
+Penggunaan platform ini diarahkan
+untuk kepentingan riset,
+keamanan,
+dan kepatuhan terhadap regulasi yang berlaku.
+</p>
+</div>
+
+<!-- BUTTON -->
+
+<div style="text-align:center">
+<a href="/index.html" class="btn">
+Access Platform
+</a>
+</div>
+
+<!-- FOOTER -->
+
+<div class="footer">
+Contact Owner: <b>@Sintak404</b><br>
+© 2026 PIATXPLOIT — Cyber Intelligence Project
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
