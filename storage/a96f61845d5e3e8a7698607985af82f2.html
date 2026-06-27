@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laubloom — Kado Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font & Style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #faf8f6; }
+        .card-premium {
+            background: #ffffff;
+            border: 1px solid #efece8;
+            transition: all 0.25s ease;
+        }
+        .card-premium:hover {
+            box-shadow: 0 16px 40px -12px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+        .input-flat {
+            background: #f8f6f4;
+            border: 1px solid #e6e2dd;
+            transition: 0.2s;
+        }
+        .input-flat:focus {
+            outline: none;
+            border-color: #b0a69b;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(176, 166, 155, 0.1);
+        }
+        .btn-primary {
+            background: #2e2a27;
+            transition: 0.2s;
+        }
+        .btn-primary:hover {
+            background: #1e1b19;
+        }
+        .btn-outline {
+            border: 1px solid #ddd8d2;
+            transition: 0.2s;
+        }
+        .btn-outline:hover {
+            border-color: #b0a69b;
+            background: #f8f6f4;
+        }
+        .chip-theme {
+            border: 1px solid #e6e2dd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .chip-theme.active {
+            border-color: #2e2a27;
+            background: #f8f6f4;
+        }
+        .chip-theme:hover {
+            border-color: #b0a69b;
+        }
+        .preview-box {
+            background: #fcfbf9;
+            border: 1px solid #efece8;
+        }
+        .separator {
+            background: #efece8;
+            height: 1px;
+            width: 100%;
+        }
+        .tag-sm {
+            background: #f0ece8;
+            color: #4d4640;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            padding: 0.2rem 0.8rem;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+        .step-number {
+            color: #ccc5bd;
+            font-weight: 300;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+        }
+        .flower-mood {
+            background: #fcfbf9;
+            border-left: 3px solid #ddd6ce;
+        }
+        .scene-item {
+            border-left: 2px solid #e6e2dd;
+            padding-left: 1rem;
+        }
+        .footer-link {
+            color: #7a726a;
+            transition: 0.2s;
+        }
+        .footer-link:hover {
+            color: #2e2a27;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+        <span class="text-xl font-light tracking-wide text-[#2e2a27]">✦</span>
+        <span class="text-sm font-light tracking-[0.15em] text-[#2e2a27]/60 uppercase">Laubloom</span>
+    </div>
+    <div class="flex items-center gap-6 text-xs text-[#2e2a27]/40 tracking-wider uppercase">
+        <a href="#" class="hover:text-[#2e2a27] transition">Tema</a>
+        <a href="#" class="hover:text-[#2e2a27] transition">Cara Kerja</a>
+        <a href="#" class="hover:text-[#2e2a27] transition">Demo</a>
+        <a href="#" class="hover:text-[#2e2a27] transition">FAQ</a>
+    </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="max-w-6xl mx-auto px-6 pt-10 pb-16">
+    <div class="grid md:grid-cols-5 gap-12 items-center">
+        <div class="md:col-span-3">
+            <span class="tag-sm inline-block mb-4">Kado Digital Personal</span>
+            <h1 class="text-4xl md:text-5xl font-light leading-tight text-[#2e2a27]">
+                Kado kecil,<br />
+                <span class="font-medium">rasanya panjang.</span>
+            </h1>
+            <p class="text-[#2e2a27]/50 text-sm leading-relaxed mt-4 max-w-sm">
+                Tulis pesanmu, pilih tema bunganya, dan biarkan dia membukanya pelan-pelan — dari kunci kecil, intro, foto, lagu, sampai surat yang kamu tulis sendiri.
+            </p>
+            <div class="flex flex-wrap gap-3 mt-6">
+                <button class="btn-primary text-white px-8 py-3 rounded-full text-sm tracking-wide">Buat Kado</button>
+                <button class="btn-outline px-8 py-3 rounded-full text-sm tracking-wide text-[#2e2a27]/60">Lihat Demo</button>
+            </div>
+            <div class="flex items-center gap-6 mt-6 text-xs text-[#2e2a27]/30 tracking-wider uppercase">
+                <span>Tanpa login</span>
+                <span class="w-px h-4 bg-[#e6e2dd]"></span>
+                <span>Preview dulu</span>
+                <span class="w-px h-4 bg-[#e6e2dd]"></span>
+                <span>Link privat</span>
+            </div>
+        </div>
+        <div class="md:col-span-2 flex justify-center">
+            <div class="preview-box rounded-2xl p-6 w-full max-w-xs">
+                <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-[#efece8] mx-auto mb-3"></div>
+                    <p class="text-xs text-[#2e2a27]/30 tracking-wider uppercase">Kunci Pembuka</p>
+                    <p class="text-sm text-[#2e2a27]/60 mt-1">masukkan PIN rahasia</p>
+                    <div class="mt-4 flex justify-center gap-2">
+                        <span class="w-8 h-8 border border-[#ddd8d2] rounded-full"></span>
+                        <span class="w-8 h-8 border border-[#ddd8d2] rounded-full"></span>
+                        <span class="w-8 h-8 border border-[#ddd8d2] rounded-full"></span>
+                        <span class="w-8 h-8 border border-[#ddd8d2] rounded-full"></span>
+                    </div>
+                    <div class="separator mt-5"></div>
+                    <p class="text-xs text-[#2e2a27]/20 mt-4 tracking-wider">intro mekar → cerita utama → buket finale</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PILIH TEMPLATE + TEMA ==================== -->
+<section class="max-w-6xl mx-auto px-6 pb-12">
+    <div class="flex items-center gap-4 mb-6">
+        <span class="text-xs tracking-[0.15em] text-[#2e2a27]/30 uppercase">Pilih Template &amp; Tema</span>
+        <span class="separator flex-1"></span>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="card-premium rounded-xl p-4 cursor-pointer">
+            <p class="text-sm font-medium text-[#2e2a27]">Anniversary</p>
+            <p class="text-xs text-[#2e2a27]/30">untuk momen tahunan</p>
+        </div>
+        <div class="card-premium rounded-xl p-4 cursor-pointer border-[#2e2a27]">
+            <p class="text-sm font-medium text-[#2e2a27]">Ulang Tahun</p>
+            <p class="text-xs text-[#2e2a27]/30">rayakan hari spesial</p>
+        </div>
+        <div class="card-premium rounded-xl p-4 cursor-pointer">
+            <p class="text-sm font-medium text-[#2e2a27]">Wisuda</p>
+            <p class="text-xs text-[#2e2a27]/30">apresiasi perjuangan</p>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-4">
+        <span class="chip-theme active px-4 py-1.5 rounded-full text-xs text-[#2e2a27]/70">Pink Romantis</span>
+        <span class="chip-theme px-4 py-1.5 rounded-full text-xs text-[#2e2a27]/70">Red Hangat</span>
+        <span class="chip-theme px-4 py-1.5 rounded-full text-xs text-[#2e2a27]/70">Yellow Ceria</span>
+        <span class="chip-theme px-4 py-1.5 rounded-full text-xs text-[#2e2a27]/70">Blue Tenang</span>
+        <span class="chip-theme px-4 py-1.5 rounded-full text-xs text-[#2e2a27]/70">White Elegan</span>
+        <span class="chip-theme px-4 py-1.5 rounded-full text-xs text-[#2e2a27]/70">Mixed</span>
+    </div>
+</section>
+
+<!-- ==================== FORM BUAT KADO ==================== -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="bg-white rounded-2xl p-6 md:p-10 border border-[#efece8]">
+        <div class="grid md:grid-cols-5 gap-8">
+            <div class="md:col-span-3">
+                <span class="step-number">01 — Mulai dari momen</span>
+                <h2 class="text-xl font-light text-[#2e2a27] mt-1">Isi detail kado</h2>
+
+                <form id="giftForm" class="mt-5 space-y-4">
+                    <div>
+                        <label class="text-xs text-[#2e2a27]/40 tracking-wider uppercase">Nama Penerima</label>
+                        <input type="text" id="receiver" placeholder="contoh: Aisha" class="input-flat w-full px-4 py-3 rounded-xl text-sm mt-1" />
+                    </div>
+                    <div>
+                        <label class="text-xs text-[#2e2a27]/40 tracking-wider uppercase">Pesan</label>
+                        <textarea id="message" rows="3" placeholder="Tulis surat untuknya..." class="input-flat w-full px-4 py-3 rounded-xl text-sm mt-1 resize-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs text-[#2e2a27]/40 tracking-wider uppercase">Kunci (PIN)</label>
+                            <input type="text" id="pin" placeholder="1234" maxlength="6" class="input-flat w-full px-4 py-3 rounded-xl text-sm mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-xs text-[#2e2a27]/40 tracking-wider uppercase">Tema</label>
+                            <select id="themeSelect" class="input-flat w-full px-4 py-3 rounded-xl text-sm mt-1">
+                                <option value="pink">Pink Romantis</option>
+                                <option value="red">Red Hangat</option>
+                                <option value="yellow">Yellow Ceria</option>
+                                <option value="blue">Blue Tenang</option>
+                                <option value="white">White Elegan</option>
+                                <option value="mixed">Mixed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary text-white w-full py-3.5 rounded-xl text-sm tracking-wide">Buat Link Kado</button>
+                </form>
+            </div>
+
+            <div class="md:col-span-2 flower-mood rounded-xl p-6 flex flex-col items-center justify-center text-center">
+                <div class="w-16 h-16 rounded-full bg-[#f0ece8] mb-4"></div>
+                <p class="text-sm font-medium text-[#2e2a27]">Preview Kado</p>
+                <p class="text-xs text-[#2e2a27]/30 mt-1">isi form untuk melihat pratinjau</p>
+                <div id="previewResult" class="mt-4 w-full bg-white rounded-xl px-4 py-3 text-sm text-[#2e2a27]/40 border border-[#efece8] truncate">link akan muncul di sini</div>
+                <button id="copyBtn" class="mt-3 text-xs text-[#2e2a27]/30 hover:text-[#2e2a27] transition tracking-wider uppercase">salin tautan</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CUSTOMER REVIEW / RASA ==================== -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="flex items-center gap-4 mb-6">
+        <span class="text-xs tracking-[0.15em] text-[#2e2a27]/30 uppercase">Rasakan Demonya</span>
+        <span class="separator flex-1"></span>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+        <div class="scene-item">
+            <p class="text-xs text-[#2e2a27]/20 tracking-wider uppercase mb-1">Rasa 01</p>
+            <p class="text-sm font-medium text-[#2e2a27]">Detik dia paham ini dibuat khusus buat dia</p>
+            <p class="text-xs text-[#2e2a27]/40 mt-1">Dari kunci pembuka sampai surat terakhir, semua kamu susun sendiri — bukan kartu generik.</p>
+        </div>
+        <div class="scene-item">
+            <p class="text-xs text-[#2e2a27]/20 tracking-wider uppercase mb-1">Rasa 02</p>
+            <p class="text-sm font-medium text-[#2e2a27]">Hal kecilmu jadi terasa kelihatan</p>
+            <p class="text-xs text-[#2e2a27]/40 mt-1">Detail yang biasanya cuma lewat chat berubah jadi momen buka hadiah yang lebih pelan.</p>
+        </div>
+        <div class="scene-item">
+            <p class="text-xs text-[#2e2a27]/20 tracking-wider uppercase mb-1">Rasa 03</p>
+            <p class="text-sm font-medium text-[#2e2a27]">Dia berhenti sebentar, bukan cuma baca lalu lewat</p>
+            <p class="text-xs text-[#2e2a27]/40 mt-1">Alur buka yang bertahap bikin dia menikmati tiap bagian — kesannya tinggal lebih lama.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CARA KERJA ==================== -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="flex items-center gap-4 mb-6">
+        <span class="text-xs tracking-[0.15em] text-[#2e2a27]/30 uppercase">Cara Kerja</span>
+        <span class="separator flex-1"></span>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="text-center">
+            <span class="step-number block">01</span>
+            <p class="text-sm font-medium text-[#2e2a27] mt-1">Pilih template</p>
+            <p class="text-xs text-[#2e2a27]/30">anniversary, ultah, wisuda</p>
+        </div>
+        <div class="text-center">
+            <span class="step-number block">02</span>
+            <p class="text-sm font-medium text-[#2e2a27] mt-1">Isi &amp; preview</p>
+            <p class="text-xs text-[#2e2a27]/30">pesan, foto, lagu, kunci</p>
+        </div>
+        <div class="text-center">
+            <span class="step-number block">03</span>
+            <p class="text-sm font-medium text-[#2e2a27] mt-1">Pilih paket</p>
+            <p class="text-xs text-[#2e2a27]/30">berapa lama link aktif</p>
+        </div>
+        <div class="text-center">
+            <span class="step-number block">04</span>
+            <p class="text-sm font-medium text-[#2e2a27] mt-1">Bagikan link</p>
+            <p class="text-xs text-[#2e2a27]/30">cukup buka browser</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PENUTUP + CTA ==================== -->
+<section class="max-w-6xl mx-auto px-6 pb-16 text-center">
+    <div class="bg-[#f8f6f4] rounded-2xl p-8 md:p-12 border border-[#efece8]">
+        <h2 class="text-2xl md:text-3xl font-light text-[#2e2a27]">Siap bikin?</h2>
+        <p class="text-[#2e2a27]/50 text-sm mt-2 max-w-sm mx-auto">Mulai dari satu pesan, biarkan hadiahnya mekar.</p>
+        <button class="btn-primary text-white px-8 py-3 rounded-full text-sm tracking-wide mt-4">Buat Kado Sekarang</button>
+        <p class="text-xs text-[#2e2a27]/30 mt-4">Mau tanya-tanya dulu? <a href="mailto:halo@laubloom.com" class="text-[#2e2a27]/60 hover:text-[#2e2a27] transition">halo@laubloom.com</a></p>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="max-w-6xl mx-auto px-6 pb-6">
+    <div class="separator mb-5"></div>
+    <div class="flex flex-wrap justify-between items-center text-xs text-[#2e2a27]/25 tracking-wider">
+        <span>✦ Laubloom — kado digital personal</span>
+        <div class="flex gap-6">
+            <a href="#" class="footer-link">Tema</a>
+            <a href="#" class="footer-link">Cara Kerja</a>
+            <a href="#" class="footer-link">FAQ</a>
+            <span>dibuat dengan niat · 2025</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    (function() {
+        const form = document.getElementById('giftForm');
+        const receiver = document.getElementById('receiver');
+        const message = document.getElementById('message');
+        const pin = document.getElementById('pin');
+        const themeSelect = document.getElementById('themeSelect');
+        const previewResult = document.getElementById('previewResult');
+        const copyBtn = document.getElementById('copyBtn');
+
+        let currentLink = '';
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = receiver.value.trim() || 'Seseorang';
+            const msg = message.value.trim() || 'Surat untukmu.';
+            const pinValue = pin.value.trim() || '1234';
+            const theme = themeSelect.value;
+
+            const id = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+            const link = 'https://laubloom.kado/' + id;
+
+            currentLink = link;
+            previewResult.textContent = link;
+            previewResult.style.color = '#2e2a27';
+
+            const btn = form.querySelector('button[type="submit"]');
+            const original = btn.textContent;
+            btn.textContent = '✓ Tautan siap';
+            btn.style.background = '#2e2a27';
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.style.background = '#2e2a27';
+            }, 2000);
+
+            // Simpan ke localStorage
+            const gifts = JSON.parse(localStorage.getItem('laubloom_gifts') || '[]');
+            gifts.push({ id, name, msg, pin: pinValue, theme, date: new Date().toISOString() });
+            localStorage.setItem('laubloom_gifts', JSON.stringify(gifts));
+
+            console.log('Kado dibuat:', { id, name, msg, pin: pinValue, theme });
+        });
+
+        copyBtn.addEventListener('click', function() {
+            if (!currentLink) {
+                alert('Buat kado terlebih dahulu.');
+                return;
+            }
+            navigator.clipboard.writeText(currentLink).then(() => {
+                const original = copyBtn.textContent;
+                copyBtn.textContent = '✓ tersalin';
+                setTimeout(() => {
+                    copyBtn.textContent = original;
+                }, 1500);
+            }).catch(() => {
+                // Fallback
+                const range = document.createRange();
+                range.selectNode(previewResult);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                alert('Tautan disalin.');
+            });
+        });
+
+        // Muat data terakhir dari localStorage
+        const saved = JSON.parse(localStorage.getItem('laubloom_gifts') || '[]');
+        if (saved.length > 0) {
+            const last = saved[saved.length - 1];
+            receiver.value = last.name || '';
+            message.value = last.msg || '';
+            pin.value = last.pin || '';
+        }
+    })();
+</script>
+
+</body>
+</html>
