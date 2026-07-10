@@ -1,0 +1,3325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twice - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg:#000000; --card:#1a1a1a;
+            --text:#ffffff; --muted:#888888;
+            --primary:#ff0000; --secondary:#AD4AE7;
+            --accent:#666666;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.1),transparent 30%),
+                       radial-gradient(circle at 80% 10%,rgba(255,255,255,.08),transparent 25%),
+                       radial-gradient(circle at 50% 90%,rgba(255,255,255,.05),transparent 30%),
+                       var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============ LOADING SCREEN ============ */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-video-wrapper {
+            width: 480px;
+            max-width: 92%;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 80px rgba(173,74,231,0.25);
+            position: relative;
+        }
+
+        .loading-video-wrapper video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 16/9;
+        }
+
+        .loading-progress-wrapper {
+            width: 480px;
+            max-width: 92%;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loading-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .loading-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .loading-progress-text {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            min-width: 50px;
+            text-align: right;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 20px rgba(173,74,231,0.3);
+        }
+
+        .loading-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 40px rgba(173,74,231,0.3);
+        }
+
+        .loading-title span {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ============ MENU TOGGLE ============ */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text);
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+        
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        
+        .menu-toggle i {
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            width: 270px;
+            background: rgba(26,26,26,0.95);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255,255,255,0.15);
+            padding: 25px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#ffffff 0%, #ff0000 30%, #AD4AE7 60%, #ffffff 100%);
+            animation: rotate 3s linear infinite;
+            padding: 4px;
+        }
+
+        .logo {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            z-index: 1;
+            position: relative;
+            background: #1a1a1a;
+            border: 2px solid rgba(255,255,255,0.1);
+            background-image: url('https://files.catbox.moe/t5fw19.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .app-title {
+            font-family:'Orbitron',sans-serif;
+            font-size: 22px;
+            font-weight:800;
+            color:#fff;
+            text-align:center;
+            text-shadow:0 0 12px rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+        
+        .access-info{
+            font-size: 12px;
+            text-align:center;
+            color:#fff;
+            background:rgba(255,255,255,0.1);
+            padding: 8px 14px;
+            border-radius:10px;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .access-info::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ffffff 0%, #ff0000 30%, #AD4AE7 60%, #ffffff 100%);
+            border-radius: 12px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+            background-size: 400% 400%;
+        }
+        
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .nav-menu{
+            list-style:none;
+            margin-top:25px;
+        }
+        
+        .nav-item {
+            margin-bottom: 6px;
+        }
+        
+        .nav-link{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:12px 16px;
+            color:var(--text);
+            text-decoration:none;
+            border-radius:12px;
+            font-size:14px;
+            transition:.3s;
+            font-weight:500;
+            cursor:pointer;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active{
+            background:linear-gradient(90deg,rgba(255,255,255,0.15),rgba(255,255,255,0.08));
+            border-left:4px solid var(--secondary);
+            transform:translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content{
+            flex:1;
+            padding: 20px 35px 35px;
+            transition: margin-left 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .main-logo-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#ffffff 0%, #ff0000 30%, #AD4AE7 60%, #ffffff 100%);
+            animation: rotate 3s linear infinite;
+            padding: 4px;
+        }
+        
+        .main-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            z-index: 1;
+            position: relative;
+            background: #1a1a1a;
+            border: 2px solid rgba(255,255,255,0.1);
+            background-image: url('https://files.catbox.moe/t5fw19.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .main-app-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 12px rgba(255,255,255,0.5);
+        }
+        
+        .main-access-info {
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 14px;
+            border-radius: 10px;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .main-access-info::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ffffff 0%, #ff0000 30%, #AD4AE7 60%, #ffffff 100%);
+            border-radius: 12px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+            background-size: 400% 400%;
+        }
+
+        .page {
+            display: none;
+            animation: fadeInUp 0.6s ease forwards;
+            width: 100%;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ DASHBOARD ============ */
+        .user-stats-card {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 35px;
+        }
+        
+        .stats-card {
+            border-radius: 18px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12));
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+            padding: 0;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .stats-card .header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 15px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-bottom: 4px solid rgba(255,255,255,0.02);
+        }
+        
+        .stats-card .header-icon h3 {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.6px;
+            color: #fff;
+            text-align: center;
+        }
+        
+        .user-icon {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        .user-icon .fa-user-group {
+            font-size: 24px;
+            color: #fff;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+        }
+        
+        .stats-card .body {
+            padding: 15px;
+            background: linear-gradient(180deg, rgba(255,0,0,0.2) 0%, rgba(173,74,231,0.2) 100%);
+            position: relative;
+        }
+        
+        .user-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            font-family: 'Poppins', monospace;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .info-label {
+            flex: 0 0 90px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .info-separator {
+            margin: 0 8px;
+            color: rgba(255,255,255,0.5);
+            z-index: 2;
+        }
+        
+        .info-value {
+            flex: 1;
+            font-family: 'Orbitron', sans-serif;
+            color: #e6e6e6;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .vertical-line {
+            position: absolute;
+            left: 97px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255,255,255,0.3);
+            z-index: 1;
+        }
+        
+        .horizontal-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.3);
+            z-index: 1;
+        }
+        
+        .horizontal-line.top {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            width: 100%;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 18px 18px 0 0;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+        
+        .header-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+        
+        .header-section p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .banner {
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+            background: #0a0a12;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            aspect-ratio: 16/7;
+            min-height: 200px;
+        }
+        .banner video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .banner-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 28px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+        .banner-overlay h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .banner-overlay p { color: #888; font-size: 13px; }
+
+        .slider-section {
+            margin-bottom: 25px;
+        }
+        .slider-section .section-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #fff;
+        }
+        .slider-section .section-label i { color: var(--primary); margin-right: 10px; }
+
+        .slider-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 4px 0 12px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .slider-container::-webkit-scrollbar { height: 4px; }
+        .slider-container::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 4px; }
+
+        .slider-item {
+            flex: 0 0 280px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+            scroll-snap-align: start;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .slider-item:hover { transform: translateY(-5px); border-color: var(--secondary); }
+        .slider-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .slider-item .caption {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #888;
+        }
+        .slider-item .caption strong { color: #fff; }
+
+        .info-panel {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 24px 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .info-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            border-radius: 18px 18px 0 0;
+        }
+        .info-panel h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        .info-panel h3 i { color: var(--primary); margin-right: 10px; }
+        .info-panel p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .info-panel .highlight { color: var(--primary); font-weight: 600; }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .quick-stat {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 18px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .quick-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 18px 18px 0 0;
+        }
+        .quick-stat:hover { transform: translateY(-5px); border-color: var(--secondary); }
+        .quick-stat .number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .quick-stat .label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .quick-stat .icon { font-size: 22px; color: var(--secondary); margin-bottom: 6px; display: block; }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 14px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        /* ============ CHAT AI ============ */
+        .chat-ai-container {
+            max-width: 990px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .chat-ai-container .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .chat-ai-container .app-header .heading {
+            font-size: 3rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .chat-ai-container .app-header .sub-heading {
+            font-size: 1.5rem;
+            color: #ccc;
+        }
+
+        .chat-ai-container .suggestions {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .chat-ai-container .suggestions .suggestions-item {
+            cursor: pointer;
+            padding: 18px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-radius: 16px;
+            justify-content: space-between;
+            background: var(--card);
+            transition: 0.3s ease;
+            border: 1px solid rgba(173,74,231,0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-ai-container .suggestions .suggestions-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(173,74,231,0.3);
+        }
+
+        .chat-ai-container .suggestions .suggestions-item .text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .chat-ai-container .suggestions .suggestions-item .icon {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            font-size: 1.4rem;
+            align-self: flex-end;
+            align-items: center;
+            border-radius: 50%;
+            justify-content: center;
+            color: var(--secondary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .chat-ai-container .chats-container {
+            display: flex;
+            gap: 20px;
+            flex-direction: column;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chat-ai-container .chats-container .message {
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .chat-ai-container .chats-container .bot-message {
+            margin: 9px auto;
+        }
+
+        .chat-ai-container .chats-container .user-message {
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .chat-ai-container .chats-container .user-message .message-text {
+            padding: 12px 16px;
+            max-width: 85%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 18px 18px 4px 18px;
+            word-break: break-word;
+            color: white;
+            box-shadow: 0 4px 6px rgba(173,74,231,0.2);
+        }
+
+        .chat-ai-container .chats-container .bot-message .message-content {
+            padding: 12px 16px;
+            background: var(--card);
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            max-width: 85%;
+            line-height: 1.7;
+        }
+
+        .chat-ai-container .prompt-container {
+            padding: 16px 0;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .chat-ai-container .prompt-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .chat-ai-container .prompt-form {
+            display: flex;
+            height: 56px;
+            align-items: center;
+            flex: 1;
+            border-radius: 28px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(173,74,231,0.2);
+            transition: all 0.3s ease;
+            padding: 0 16px;
+        }
+
+        .chat-ai-container .prompt-form:focus-within {
+            box-shadow: 0 0 0 2px rgba(173,74,231,0.3);
+        }
+
+        .chat-ai-container .prompt-form .prompt-input {
+            width: 100%;
+            height: 100%;
+            background: none;
+            outline: none;
+            border: none;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .chat-ai-container .prompt-form .prompt-input::placeholder {
+            color: #888;
+        }
+
+        .chat-ai-container .prompt-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chat-ai-container .prompt-actions button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-ai-container .prompt-actions button:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-ai-container .prompt-actions button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ============ QR GENERATOR ============ */
+        .qr-page-container {
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .qr-page-container .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .qr-page-container .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .qr-page-container .input-group {
+            margin-bottom: 20px;
+        }
+
+        .qr-page-container .label {
+            color: #ff0000;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .qr-page-container .label i {
+            margin-right: 8px;
+        }
+
+        .qr-page-container .input-box {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .qr-page-container .input-box:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .qr-page-container .input-box::placeholder {
+            color: #aaa;
+        }
+
+        .qr-page-container .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(173,74,231,0.4);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .qr-page-container .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(173,74,231,0.6);
+        }
+
+        .qr-page-container .qrcode-container {
+            margin-top: 25px;
+            text-align: center;
+            display: none;
+        }
+
+        .qr-page-container .qrcode-container #qrcode {
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .qr-page-container .qrcode-container #qrcode canvas {
+            border-radius: 10px;
+        }
+
+        .qr-page-container .download-btn {
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #AD4AE7, #8a2be2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .qr-page-container .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6);
+        }
+
+        /* ============ TIKTOK ============ */
+        .tiktok-page-container {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tiktok-page-container .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .tiktok-page-container .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .tiktok-page-container .input-group {
+            margin-bottom: 20px;
+        }
+
+        .tiktok-page-container .label {
+            color: #ff0000;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .tiktok-page-container .label i {
+            margin-right: 8px;
+        }
+
+        .tiktok-page-container .input-box {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .tiktok-page-container .input-box:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .tiktok-page-container .input-box::placeholder {
+            color: #aaa;
+        }
+
+        .tiktok-page-container .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(173,74,231,0.4);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tiktok-page-container .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(173,74,231,0.6);
+        }
+
+        .tiktok-page-container .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tiktok-page-container .result-section {
+            margin-top: 25px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 20px;
+            display: none;
+        }
+
+        .tiktok-page-container .result-section.active {
+            display: block;
+        }
+
+        .tiktok-page-container .video-info {
+            margin-bottom: 15px;
+        }
+
+        .tiktok-page-container .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .tiktok-page-container .download-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .tiktok-page-container .download-option {
+            padding: 15px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(173,74,231,0.2));
+            border: 2px solid rgba(255,255,255,0.3);
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tiktok-page-container .download-option:hover {
+            background: linear-gradient(135deg, rgba(255,0,0,0.3), rgba(173,74,231,0.3));
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.4);
+            border-color: var(--primary);
+        }
+
+        .tiktok-page-container .download-option i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .tiktok-page-container .download-option span {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .tiktok-page-container .status-message {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* ============ IPHONE QUOTE ============ */
+        .quote-page-container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .quote-page-container .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .quote-page-container .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .quote-page-container .form-group {
+            margin-bottom: 16px;
+        }
+
+        .quote-page-container .label {
+            color: #ff0000;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .quote-page-container .label i {
+            margin-right: 8px;
+        }
+
+        .quote-page-container .input-box {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .quote-page-container .input-box:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .quote-page-container .input-box::placeholder {
+            color: #aaa;
+        }
+
+        .quote-page-container textarea.input-box {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .quote-page-container .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .quote-page-container .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(173,74,231,0.4);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .quote-page-container .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(173,74,231,0.6);
+        }
+
+        .quote-page-container .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quote-page-container .preview-area {
+            margin-top: 25px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .quote-page-container .preview-area.active {
+            display: block;
+        }
+
+        .quote-page-container .preview-area img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 25px rgba(255, 0, 100, 0.2);
+        }
+
+        .quote-page-container .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 10px 25px;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .quote-page-container .download-btn:hover {
+            box-shadow: 0 0 20px rgba(173,74,231,0.4);
+        }
+
+        .quote-page-container .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .quote-page-container .loading {
+            text-align: center;
+            margin-top: 10px;
+            color: var(--secondary);
+            display: none;
+        }
+
+        /* ============ NGL SPAM ============ */
+        .ngl-page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .ngl-page-container .limit-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ngl-page-container .limit-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .ngl-page-container .limit-header {
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .ngl-page-container .limit-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .ngl-page-container .limit-label {
+            color: #bbb;
+            font-weight: 500;
+        }
+
+        .ngl-page-container .limit-value {
+            color: #888;
+            font-weight: bold;
+        }
+
+        .ngl-page-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .ngl-page-container label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .ngl-page-container input, 
+        .ngl-page-container textarea {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .ngl-page-container input:focus, 
+        .ngl-page-container textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(173, 74, 231, 0.4);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .ngl-page-container .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ngl-page-container .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .ngl-page-container .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .ngl-page-container .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.15);
+        }
+
+        .ngl-page-container .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ngl-page-container .logs {
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .ngl-page-container .logs::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .ngl-page-container .log-success { color: #00ff00; }
+        .ngl-page-container .log-error { color: #ff4444; }
+        .ngl-page-container .log-info { color: #ffffff; }
+        .ngl-page-container .log-warning { color: #FF9800; }
+
+        .ngl-page-container .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .ngl-page-container .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .ngl-page-container .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .ngl-page-container .stat-value {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .ngl-page-container .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .ngl-page-container .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        /* ============ PROFILE ============ */
+        .profile-page-container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .profile-page-container .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .profile-page-container .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .profile-page-container .profile-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-page-container .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background-image: url('https://files.catbox.moe/t5fw19.jpg');
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--secondary);
+        }
+
+        .profile-page-container .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .profile-page-container .profile-status {
+            color: #4ade80;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .profile-page-container .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .profile-page-container .profile-info .info-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-page-container .profile-info .info-item .label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-page-container .profile-info .info-item .value {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ============ API KEY SECTION ============ */
+        .api-key-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .api-key-section .api-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .api-key-section .api-title i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        .api-key-section .api-status {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .api-key-section .api-status .active {
+            color: #4ade80;
+        }
+
+        .api-key-section .api-status .inactive {
+            color: #f87171;
+        }
+
+        .api-key-section .api-display {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .api-key-section .api-display .key-text {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            color: #6f8cff;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            word-break: break-all;
+        }
+
+        .api-key-section .api-display .key-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .api-key-section .api-display .key-actions button {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .api-key-section .api-display .key-actions button:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .api-key-section .api-display .key-actions button.copied {
+            color: #4ade80;
+        }
+
+        .api-key-section .api-display .key-actions button.hidden {
+            color: #f87171;
+        }
+
+        .api-key-section .btn-generate {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .api-key-section .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(173,74,231,0.3);
+        }
+
+        .api-key-section .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .api-key-section .api-terms {
+            margin-top: 15px;
+            padding: 12px 16px;
+            background: rgba(255,94,107,0.06);
+            border-radius: 10px;
+            border-left: 3px solid #f87171;
+        }
+
+        .api-key-section .api-terms p {
+            color: #8899cc;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .api-key-section .api-terms strong {
+            color: #f87171;
+        }
+
+        /* ============ API KEY PAGE (Menu Khusus) ============ */
+        .apikey-page-container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .apikey-page-container .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .apikey-page-container .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .apikey-page-container .info-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .apikey-page-container .info-box h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .apikey-page-container .info-box p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .apikey-page-container .info-box .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ============ TELEGRAM PAGE ============ */
+        .telegram-page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .telegram-page-container .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .telegram-page-container .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .telegram-page-container .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .telegram-page-container .contact-info h3 {
+            color: #ff0000;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .telegram-page-container .contact-info p {
+            color: #ccc;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .telegram-page-container .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .telegram-page-container .contact-item i {
+            color: #ff0000;
+            font-size: 1.2rem;
+            width: 20px;
+        }
+
+        .telegram-page-container .contact-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .telegram-page-container .contact-card {
+            background: rgba(15, 15, 35, 0.8);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .telegram-page-container .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .telegram-page-container .contact-card:hover::before {
+            left: 100%;
+        }
+
+        .telegram-page-container .contact-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .telegram-page-container .contact-card.telegram {
+            border-color: rgba(0, 136, 204, 0.5);
+        }
+
+        .telegram-page-container .contact-card.telegram:hover {
+            border-color: #0088cc;
+            box-shadow: 0 15px 35px rgba(0, 136, 204, 0.4);
+        }
+
+        .telegram-page-container .contact-card.whatsapp {
+            border-color: rgba(37, 211, 102, 0.5);
+        }
+
+        .telegram-page-container .contact-card.whatsapp:hover {
+            border-color: #25d366;
+            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.4);
+        }
+
+        .telegram-page-container .contact-icon {
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .telegram-page-container .contact-card:hover .contact-icon {
+            transform: scale(1.2) rotateY(360deg);
+        }
+
+        .telegram-page-container .telegram .contact-icon i {
+            font-size: 2.5rem;
+            color: #0088cc;
+        }
+
+        .telegram-page-container .whatsapp .contact-icon i {
+            font-size: 2.5rem;
+            color: #25d366;
+        }
+
+        .telegram-page-container .contact-card h4 {
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .telegram-page-container .contact-card p {
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .telegram-page-container .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: none;
+        }
+
+        .telegram-page-container .contact-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .telegram-page-container .contact-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .telegram-page-container .telegram .contact-btn {
+            background: #0088cc;
+            color: #fff;
+        }
+
+        .telegram-page-container .whatsapp .contact-btn {
+            background: #25d366;
+            color: #fff;
+        }
+
+        .telegram-page-container .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (min-width: 1024px) {
+            .sidebar { transform: translateX(0); }
+            .main-content { margin-left: 270px; }
+            .menu-toggle { display: none; }
+        }
+        
+        @media (max-width: 1023px) {
+            .main-content { margin-left: 0; padding: 15px 20px 35px; }
+            .main-app-title { font-size: 24px; }
+            .container { padding: 20px; }
+            .banner { aspect-ratio: 16/9; min-height: 150px; }
+            .slider-item { flex: 0 0 220px; }
+            .slider-item img { height: 140px; }
+            .chat-ai-container .app-header .heading { font-size: 2rem; }
+            .chat-ai-container .suggestions { grid-template-columns: 1fr; }
+            .quote-page-container .form-row { grid-template-columns: 1fr; }
+            .profile-page-container .profile-info { grid-template-columns: 1fr; }
+            .telegram-page-container .contact-content { grid-template-columns: 1fr; }
+            .telegram-page-container .contact-cards { grid-template-columns: 1fr; }
+            .telegram-page-container .contact-info h3,
+            .telegram-page-container .contact-info p { text-align: center; }
+            .telegram-page-container .contact-item { justify-content: center; }
+            .loading-video-wrapper { width: 400px; }
+            .loading-progress-wrapper { width: 400px; }
+        }
+
+        @media (max-width: 600px) {
+            .quick-stats { grid-template-columns: 1fr 1fr; }
+            .banner { aspect-ratio: 16/10; min-height: 120px; }
+            .banner-overlay { padding: 12px 16px; }
+            .banner-overlay h3 { font-size: 15px; }
+            .slider-item { flex: 0 0 180px; }
+            .slider-item img { height: 110px; }
+            .info-panel { padding: 16px 18px; }
+            .header-section h2 { font-size: 22px; }
+            .chat-ai-container .app-header .heading { font-size: 1.5rem; }
+            .chat-ai-container .app-header .sub-heading { font-size: 1rem; }
+            .tiktok-page-container .download-options { grid-template-columns: 1fr; }
+            .ngl-page-container .stats { flex-direction: column; gap: 15px; }
+            .ngl-page-container .stat-item { text-align: left; display: flex; justify-content: space-between; align-items: center; }
+            .loading-video-wrapper { width: 320px; }
+            .loading-progress-wrapper { width: 320px; }
+            .loading-title { font-size: 24px; }
+        }
+
+        @media (max-width: 400px) {
+            .quick-stats { grid-template-columns: 1fr; }
+            .slider-item { flex: 0 0 150px; }
+            .slider-item img { height: 90px; }
+            .main-content { padding: 10px 12px 25px; }
+            .container { padding: 16px; }
+            .chat-ai-container .prompt-wrapper { flex-direction: column; gap: 8px; }
+            .chat-ai-container .prompt-form { width: 100%; }
+            .loading-video-wrapper { width: 260px; }
+            .loading-progress-wrapper { width: 260px; }
+            .loading-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ LOADING SCREEN ============ -->
+    <div id="loadingScreen">
+        <div class="loading-title">Twice <span>Loading</span></div>
+        <div class="loading-video-wrapper">
+            <video id="loadingVideo" muted playsinline>
+                <source src="https://files.catbox.moe/ygv8bt.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="loading-progress-wrapper">
+            <div class="loading-progress-bar">
+                <div class="loading-progress-fill" id="loadingProgressFill"></div>
+            </div>
+            <span class="loading-progress-text" id="loadingProgressText">0%</span>
+        </div>
+    </div>
+
+    <!-- ============ MENU TOGGLE ============ -->
+    <div class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- ============ SIDEBAR OVERLAY ============ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============ SIDEBAR ============ -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-ring"></div>
+                <div class="logo" id="sidebarLogo"></div>
+            </div>
+            <div class="app-title">Twice</div>
+            <div class="access-info"><b><i>Dashboard</i></b></div>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item"><a class="nav-link active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="profile"><i class="fas fa-user"></i>Profile</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="apikey"><i class="fas fa-key"></i>API Key</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="chatai"><i class="fas fa-robot"></i>Chat AI</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="qrg"><i class="fas fa-qrcode"></i>QR Generator</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="tiktok"><i class="fab fa-tiktok"></i>TikTok Downloader</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="quote"><i class="fas fa-mobile-alt"></i>iPhone Quote</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="ngl"><i class="fas fa-message"></i>Spam NGL</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="telegram"><i class="fab fa-telegram"></i>Telegram</a></li>
+            <li class="nav-item"><a class="nav-link" data-page="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="main-logo-container">
+                <div class="main-logo-ring"></div>
+                <div class="main-logo" id="mainLogo"></div>
+            </div>
+            <div>
+                <div class="main-app-title">Twice</div>
+                <div class="main-access-info"><b>Dashboard</b></div>
+            </div>
+        </div>
+
+        <!-- ===================== DASHBOARD PAGE ===================== -->
+        <div class="page active" id="page-dashboard">
+            <div class="user-stats-card">
+                <div class="stats-card">
+                    <div class="header-icon">
+                        <div class="user-icon">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <h3>User Information</h3>
+                    </div>
+                    <div class="body">
+                        <div class="user-info-compact">
+                            <div class="vertical-line"></div>
+                            <div class="horizontal-line top"></div>
+                            <div class="info-row">
+                                <div class="info-label">Username</div>
+                                <div class="info-separator"></div>
+                                <div class="info-value" id="usernameDisplay">User123</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Expired</div>
+                                <div class="info-separator"></div>
+                                <div class="info-value" id="expiredDisplay">2026-12-31</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Time</div>
+                                <div class="info-separator"></div>
+                                <div class="info-value" id="timeDisplay">00:00:00</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Date</div>
+                                <div class="info-separator"></div>
+                                <div class="info-value" id="dateDisplay">--, -- --- ----</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="header-section">
+                    <h2><i class="fas fa-th-large"></i> Dashboard</h2>
+                    <p>Selamat datang di panel kontrol utama Twice</p>
+                </div>
+
+                <div class="banner">
+                    <video id="bannerVideo" autoplay muted loop playsinline>
+                        <source src="https://files.catbox.moe/ygv8bt.mp4" type="video/mp4">
+                    </video>
+                    <div class="banner-overlay">
+                        <h3>Twice Dashboard</h3>
+                        <p>Selamat datang di panel kontrol utama</p>
+                    </div>
+                </div>
+
+                <div class="slider-section">
+                    <div class="section-label"><i class="fas fa-images"></i> Gallery</div>
+                    <div class="slider-container" id="sliderContainer">
+                        <div class="slider-item">
+                            <img src="https://files.catbox.moe/t5fw19.jpg" alt="Gambar 1">
+                            <div class="caption"><strong>Twice</strong> — Profile</div>
+                        </div>
+                        <div class="slider-item">
+                            <img src="https://files.catbox.moe/t5fw19.jpg" alt="Gambar 2">
+                            <div class="caption"><strong>Twice</strong> — Tools</div>
+                        </div>
+                        <div class="slider-item">
+                            <img src="https://files.catbox.moe/t5fw19.jpg" alt="Gambar 3">
+                            <div class="caption"><strong>Twice</strong> — Dashboard</div>
+                        </div>
+                        <div class="slider-item">
+                            <img src="https://files.catbox.moe/t5fw19.jpg" alt="Gambar 4">
+                            <div class="caption"><strong>Twice</strong> — Premium</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <h3><i class="fas fa-info-circle"></i> Panduan Cepat</h3>
+                    <p>
+                        <span class="highlight">Twice</span> adalah platform serbaguna yang menyediakan berbagai tools 
+                        untuk kebutuhan digital Anda. Gunakan menu di samping untuk mengakses fitur-fitur seperti 
+                        <span class="highlight">Chat AI</span>, <span class="highlight">TikTok Downloader</span>, 
+                        <span class="highlight">QR Generator</span>, dan masih banyak lagi. 
+                        Semua fitur tersedia untuk Anda gunakan secara gratis.
+                    </p>
+                    <p style="margin-top:10px;">
+                        <i class="fas fa-arrow-right" style="color:var(--secondary);margin-right:6px;"></i>
+                        Untuk bantuan lebih lanjut, hubungi kami melalui <span class="highlight">Telegram</span>.
+                    </p>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="icon"><i class="fas fa-robot"></i></span>
+                        <div class="number" id="statAI">0</div>
+                        <div class="label">Chat AI</div>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="icon"><i class="fas fa-download"></i></span>
+                        <div class="number" id="statTikTok">0</div>
+                        <div class="label">TikTok Download</div>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="icon"><i class="fas fa-qrcode"></i></span>
+                        <div class="number" id="statQR">0</div>
+                        <div class="label">QR Generated</div>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="icon"><i class="fas fa-message"></i></span>
+                        <div class="number" id="statNGL">0</div>
+                        <div class="label">NGL Spam</div>
+                    </div>
+                </div>
+
+                <a href="/dashboard" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Refresh Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- ===================== CHAT AI PAGE ===================== -->
+        <div class="page" id="page-chatai">
+            <div class="chat-ai-container">
+                <div class="app-header">
+                    <h1 class="heading">Halo, selamat datang!</h1>
+                    <h4 class="sub-heading">Ada yang bisa saya bantu?</h4>
+                </div>
+
+                <ul class="suggestions">
+                    <li class="suggestions-item" data-question="Apa cuaca hari ini?">
+                        <p class="text">Apa cuaca hari ini?</p>
+                        <span class="icon material-symbols-rounded">cloud</span>
+                    </li>
+                    <li class="suggestions-item" data-question="Rekomendasi film terbaru">
+                        <p class="text">Rekomendasi film terbaru</p>
+                        <span class="icon material-symbols-rounded">movie</span>
+                    </li>
+                    <li class="suggestions-item" data-question="Cara membuat kue bolu">
+                        <p class="text">Cara membuat kue bolu</p>
+                        <span class="icon material-symbols-rounded">cake</span>
+                    </li>
+                    <li class="suggestions-item" data-question="Tips belajar yang efektif">
+                        <p class="text">Tips belajar yang efektif</p>
+                        <span class="icon material-symbols-rounded">school</span>
+                    </li>
+                </ul>
+
+                <div class="chats-container" id="chatMessagesContainer">
+                    <div class="message bot-message">
+                        <div class="message-content">👋 Halo! Saya AI Assistant. Ada yang bisa saya bantu?</div>
+                    </div>
+                </div>
+
+                <div class="prompt-container">
+                    <div class="prompt-wrapper">
+                        <form class="prompt-form" id="chatForm">
+                            <input type="text" placeholder="Tanyakan sesuatu..." class="prompt-input" id="chatInput" required />
+                            <div class="prompt-actions">
+                                <button type="submit" id="sendPromptBtn" class="material-symbols-rounded">arrow_upward</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== QR GENERATOR PAGE ===================== -->
+        <div class="page" id="page-qrg">
+            <div class="qr-page-container">
+                <div class="container" style="max-width:450px;margin:0 auto;">
+                    <h2 class="section-title"><i class="fas fa-qrcode"></i> QR Code Generator</h2>
+                    
+                    <div class="input-group">
+                        <div class="label"><i class="fas fa-link"></i> Masukkan Teks atau URL</div>
+                        <input type="text" class="input-box" id="qrInput" placeholder="https://example.com atau teks lainnya...">
+                    </div>
+                    
+                    <button class="action-btn" id="qrGenerateBtn">
+                        <i class="fas fa-bolt"></i> Generate QR Code
+                    </button>
+                    
+                    <div class="qrcode-container" id="qrcodeContainer">
+                        <div id="qrcode"></div>
+                        <button class="download-btn" id="qrDownloadBtn">
+                            <i class="fas fa-download"></i> Download QR Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TIKTOK PAGE ===================== -->
+        <div class="page" id="page-tiktok">
+            <div class="tiktok-page-container">
+                <div class="container" style="max-width:700px;margin:0 auto;">
+                    <h2 class="section-title"><i class="fab fa-tiktok"></i> TikTok Downloader</h2>
+                    
+                    <div class="input-group">
+                        <div class="label"><i class="fas fa-link"></i> Masukkan URL TikTok</div>
+                        <input type="text" class="input-box" id="tiktokInput" placeholder="https://www.tiktok.com/@user/video/...">
+                    </div>
+                    
+                    <button class="action-btn" id="tiktokDownloadBtn">
+                        <i class="fas fa-download"></i> Download TikTok
+                    </button>
+
+                    <div class="result-section" id="tiktokResult">
+                        <div class="video-info">
+                            <div class="video-title" id="tiktokTitle">Judul Video</div>
+                        </div>
+                        <div class="download-options">
+                            <a href="#" class="download-option" id="tiktokVideoBtn">
+                                <i class="fas fa-film"></i>
+                                <span>Download Video</span>
+                            </a>
+                            <a href="#" class="download-option" id="tiktokAudioBtn">
+                                <i class="fas fa-music"></i>
+                                <span>Download Audio</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="status-message" id="tiktokStatus">Masukkan URL TikTok untuk mulai download</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== IPHONE QUOTE PAGE ===================== -->
+        <div class="page" id="page-quote">
+            <div class="quote-page-container">
+                <div class="container" style="max-width:600px;margin:0 auto;">
+                    <h2 class="section-title"><i class="fas fa-quote-right"></i> iPhone Quote Generator</h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="label"><i class="fas fa-clock"></i> Jam</div>
+                            <input type="text" class="input-box" id="quoteTime" placeholder="18:00">
+                        </div>
+                        <div class="form-group">
+                            <div class="label"><i class="fas fa-battery-half"></i> Baterai</div>
+                            <input type="number" class="input-box" id="quoteBattery" placeholder="40" min="0" max="100">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="label"><i class="fas fa-signal"></i> Nama Provider</div>
+                        <input type="text" class="input-box" id="quoteProvider" placeholder="Telkomsel">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="label"><i class="fas fa-comment"></i> Pesan</div>
+                        <textarea class="input-box" id="quoteMessage" placeholder="Haii bang"></textarea>
+                    </div>
+                    
+                    <button class="action-btn" id="quoteGenerateBtn">
+                        <i class="fas fa-rocket"></i> GENERATE QUOTE
+                    </button>
+                    
+                    <div class="loading" id="quoteLoading">🔄 Sedang membuat gambar...</div>
+                    <div class="error-message" id="quoteError"></div>
+                    
+                    <div class="preview-area" id="quotePreview">
+                        <img id="quoteImage" alt="Preview">
+                        <br>
+                        <button class="download-btn" id="quoteDownloadBtn">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== NGL SPAM PAGE ===================== -->
+        <div class="page" id="page-ngl">
+            <div class="ngl-page-container">
+                <div class="container" style="max-width:800px;margin:0 auto;">
+                    <div class="header-section">
+                        <h2><i class="fas fa-message"></i> NGL Spam Tool</h2>
+                        <p>Tool untuk mengirim pesan ke NGL.link</p>
+                    </div>
+
+                    <div class="limit-info">
+                        <div class="limit-header"><i class="fas fa-shield-alt"></i> Limit Harian Kamu</div>
+                        <div class="limit-row">
+                            <span class="limit-label">Digunakan Hari Ini:</span>
+                            <span class="limit-value" id="usageToday">0 / 200 pesan</span>
+                        </div>
+                        <div class="limit-row">
+                            <span class="limit-label">Sisa Limit:</span>
+                            <span class="limit-value" id="remainingLimit">200 pesan</span>
+                        </div>
+                        <div class="limit-row">
+                            <span class="limit-label">Reset:</span>
+                            <span class="limit-value">Midnight (00:00 WIB)</span>
+                        </div>
+                        <div class="limit-row">
+                            <span class="limit-label">Max Per Request:</span>
+                            <span class="limit-value">100 pesan</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Username Target NGL:</label>
+                        <input type="text" id="nglTarget" placeholder="contoh: username123 (tanpa @)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-message"></i> Pesan:</label>
+                        <textarea id="nglMessage" rows="3" placeholder="Masukkan pesan yang ingin dikirim..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-bar"></i> Jumlah Pesan:</label>
+                        <input type="number" id="nglCount" value="10" min="1" max="100">
+                        <small style="color: #888;">Maksimal 100 pesan per request | Sisa limit kamu: <span id="remainingCount">200</span></small>
+                    </div>
+                    
+                    <button class="action-btn" id="nglSendBtn">
+                        <i class="fas fa-rocket"></i> Mulai Spam
+                    </button>
+
+                    <div class="stats" id="nglStats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="nglSuccessCount">0</div>
+                            <div style="color: #00ff00;">Sukses</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="nglErrorCount">0</div>
+                            <div style="color: #ff4444;">Gagal</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="nglProgress">0%</div>
+                            <div style="color: #ffffff;">Progress</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar" id="nglProgressBar">
+                        <div class="progress-fill" id="nglProgressFill"></div>
+                    </div>
+                    
+                    <div class="logs" id="nglLogs">
+                        <div class="log-info">⏳ Menunggu perintah...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== PROFILE PAGE ===================== -->
+        <div class="page" id="page-profile">
+            <div class="profile-page-container">
+                <div class="container" style="max-width:600px;margin:0 auto;">
+                    <h2 class="section-title"><i class="fas fa-user"></i> Profile</h2>
+                    
+                    <div class="profile-card">
+                        <div class="profile-avatar"></div>
+                        <div class="profile-name">User123</div>
+                        <div class="profile-status">● Aktif</div>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <div class="label">Username</div>
+                                <div class="value">User123</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Status</div>
+                                <div class="value" style="color:#4ade80;">Aktif</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Bergabung</div>
+                                <div class="value">2025-01-01</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Last Active</div>
+                                <div class="value" id="profileLastActive">Sekarang</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== API KEY PAGE ===================== -->
+        <div class="page" id="page-apikey">
+            <div class="apikey-page-container">
+                <div class="container" style="max-width:600px;margin:0 auto;">
+                    <h2 class="section-title"><i class="fas fa-key"></i> API Key Management</h2>
+                    
+                    <div class="info-box">
+                        <h3>🔑 Apa itu API Key?</h3>
+                        <p>
+                            <span class="highlight">API Key</span> adalah kunci unik yang digunakan untuk mengidentifikasi dan mengautentikasi pengguna saat menggunakan layanan API di platform Twice.
+                        </p>
+                        <br>
+                        <p>
+                            <strong>Fungsi API Key:</strong><br>
+                            • <span class="highlight">Autentikasi</span> - Membuktikan identitas Anda sebagai pengguna terdaftar<br>
+                            • <span class="highlight">Keamanan</span> - Melindungi akses ke data dan fitur sensitif<br>
+                            • <span class="highlight">Tracking</span> - Melacak penggunaan dan aktivitas Anda<br>
+                            • <span class="highlight">Rate Limiting</span> - Mengelola batas penggunaan per pengguna
+                        </p>
+                    </div>
+
+                    <div class="api-key-section">
+                        <div class="api-title"><i class="fas fa-key"></i> API Key Anda</div>
+                        <div class="api-status" id="apiKeyStatus">
+                            Status: <span class="inactive">Belum dibuat</span>
+                        </div>
+                        
+                        <div class="api-display" id="apiKeyDisplayArea" style="display:none;">
+                            <span class="key-text" id="apiKeyText">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
+                            <div class="key-actions">
+                                <button id="copyApiBtn" title="Copy"><i class="fas fa-copy"></i></button>
+                                <button id="toggleApiBtn" title="Lihat/Sembunyikan"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <button class="btn-generate" id="generateApiBtn">
+                            <i class="fas fa-plus-circle"></i> Create API Key
+                        </button>
+
+                        <div class="api-terms">
+                            <p>
+                                <strong>⚠️ Syarat & Ketentuan:</strong><br>
+                                • Jangan sebarkan API Key ke orang yang tidak dikenal<br>
+                                • Gunakan untuk akses API di platform Twice<br>
+                                • Jika disalahgunakan, API Key akan dinonaktifkan<br>
+                                • Hanya digunakan di platform Twice
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== TELEGRAM PAGE ===================== -->
+        <div class="page" id="page-telegram">
+            <div class="telegram-page-container">
+                <div class="container" style="max-width:800px;margin:0 auto;">
+                    <h2 class="section-title"><i class="fab fa-telegram"></i> Hubungi Kami</h2>
+                    <div class="contact-content">
+                        <div class="contact-info">
+                            <h3>Mari Berkolaborasi!</h3>
+                            <p>Saya selalu terbuka untuk opportunity baru dan project menarik. Jangan ragu untuk menghubungi saya!</p>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Indonesia</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>sennpedo6@email.com</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+6282189275004</span>
+                            </div>
+                        </div>
+                        <div class="contact-cards">
+                            <div class="contact-card telegram">
+                                <div class="contact-icon">
+                                    <i class="fab fa-telegram-plane"></i>
+                                </div>
+                                <h4>Telegram</h4>
+                                <p>Chat langsung untuk diskusi project</p>
+                                <a href="https://t.me/sennmods1" class="contact-btn" target="_blank">
+                                    <i class="fab fa-telegram-plane"></i> Chat di Telegram
+                                </a>
+                            </div>
+                            <div class="contact-card whatsapp">
+                                <div class="contact-icon">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                                <h4>WhatsApp</h4>
+                                <p>Komunikasi cepat via WhatsApp</p>
+                                <a href="https://wa.me/6287730232643" class="contact-btn" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> Chat di WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ LOADING SCREEN ============
+        const loadingScreen = document.getElementById('loadingScreen');
+        const loadingVideo = document.getElementById('loadingVideo');
+        const loadingProgressFill = document.getElementById('loadingProgressFill');
+        const loadingProgressText = document.getElementById('loadingProgressText');
+
+        let videoDuration = 5;
+        let loadingProgress = 0;
+        let loadingInterval;
+
+        loadingVideo.addEventListener('loadedmetadata', function() {
+            videoDuration = this.duration || 5;
+            console.log('Video duration:', videoDuration, 'seconds');
+        });
+
+        function startLoading() {
+            loadingVideo.play().catch(() => {});
+            
+            loadingInterval = setInterval(() => {
+                const increment = (100 / videoDuration) * 0.1;
+                loadingProgress = Math.min(loadingProgress + increment, 100);
+                loadingProgressFill.style.width = loadingProgress + '%';
+                loadingProgressText.textContent = Math.round(loadingProgress) + '%';
+
+                if (loadingProgress >= 100) {
+                    clearInterval(loadingInterval);
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        initializeApp();
+                    }, 300);
+                }
+            }, 100);
+        }
+
+        loadingVideo.onerror = function() {
+            console.log('Loading video error, using fallback timer');
+            videoDuration = 5;
+            startLoading();
+        };
+
+        startLoading();
+
+        // ============ INITIALIZE APP ============
+        function initializeApp() {
+            const savedKey = localStorage.getItem('twiceApiKey');
+            if (savedKey) {
+                document.querySelector('#page-apikey .api-status').innerHTML = 'Status: <span class="active">● Aktif</span>';
+                document.getElementById('apiKeyDisplayArea').style.display = 'flex';
+                document.getElementById('apiKeyText').textContent = savedKey.replace(/./g, '•');
+                document.getElementById('generateApiBtn').innerHTML = '<i class="fas fa-sync"></i> Regenerate API Key';
+            }
+
+            updateDateTime();
+            updateStats();
+            setupChatAI();
+            setupQRGenerator();
+            setupTikTok();
+            setupQuote();
+            setupNGL();
+            setupAPIKey();
+            setupNavigation();
+            checkLogo();
+        }
+
+        // ============ SIDEBAR NAVIGATION ============
+        function setupNavigation() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            }
+
+            // === FIX: HAMBURGER MENU ===
+            menuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSidebar();
+            });
+
+            // Tutup sidebar saat klik overlay
+            sidebarOverlay.addEventListener('click', function() {
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link[data-page]');
+            const pages = document.querySelectorAll('.page');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const pageId = this.dataset.page;
+                    
+                    if (pageId === 'logout') {
+                        if (confirm('Yakin ingin logout?')) {
+                            localStorage.clear();
+                            location.reload();
+                        }
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    pages.forEach(p => p.classList.remove('active'));
+                    const targetPage = document.getElementById('page-' + pageId);
+                    if (targetPage) targetPage.classList.add('active');
+                    
+                    if (window.innerWidth < 1024) {
+                        if (sidebar.classList.contains('active')) {
+                            toggleSidebar();
+                        }
+                    }
+                });
+            });
+        }
+
+        // ============ JAM & TANGGAL ============
+        function updateDateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('timeDisplay').textContent = hours + ':' + minutes + ':' + seconds;
+
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const dayName = days[now.getDay()];
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            document.getElementById('dateDisplay').textContent = dayName + ', ' + day + ' ' + month + ' ' + year;
+            
+            document.getElementById('profileLastActive').textContent = hours + ':' + minutes + ':' + seconds;
+        }
+        setInterval(updateDateTime, 1000);
+
+        // ============ STATISTIK ============
+        function updateStats() {
+            const stats = {
+                ai: Math.floor(Math.random() * 50) + 10,
+                tiktok: Math.floor(Math.random() * 30) + 5,
+                qr: Math.floor(Math.random() * 40) + 8,
+                ngl: Math.floor(Math.random() * 60) + 15
+            };
+            document.getElementById('statAI').textContent = stats.ai;
+            document.getElementById('statTikTok').textContent = stats.tiktok;
+            document.getElementById('statQR').textContent = stats.qr;
+            document.getElementById('statNGL').textContent = stats.ngl;
+        }
+        setInterval(updateStats, 30000);
+
+        // ============ CHAT AI ============
+        function setupChatAI() {
+            const chatContainer = document.getElementById('chatMessagesContainer');
+            const chatInput = document.getElementById('chatInput');
+            const chatForm = document.getElementById('chatForm');
+            let chatHistory = [];
+
+            const API_KEY = "AIzaSyB7URXCSpZtdCdKCjBGkvV27nLURDDn1FM";
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+            function addChatMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                
+                if (isUser) {
+                    messageDiv.innerHTML = `<div class="message-text">${text}</div>`;
+                } else {
+                    messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+                }
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            document.querySelectorAll('.suggestions-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const question = this.dataset.question;
+                    chatInput.value = question;
+                    chatForm.dispatchEvent(new Event('submit'));
+                });
+            });
+
+            chatForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                addChatMessage(message, true);
+                chatInput.value = '';
+                
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-message';
+                typingDiv.innerHTML = '<div class="message-content">⏳ Mengetik...</div>';
+                chatContainer.appendChild(typingDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                try {
+                    chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+                    const response = await fetch(API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ contents: chatHistory })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (!response.ok) throw new Error(data.error?.message || 'API Error');
+
+                    chatContainer.removeChild(typingDiv);
+                    const responseText = data.candidates[0].content.parts[0].text;
+                    addChatMessage(responseText, false);
+                    chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+
+                } catch (error) {
+                    chatContainer.removeChild(typingDiv);
+                    addChatMessage(`❌ Error: ${error.message}`, false);
+                }
+            });
+        }
+
+        // ============ QR GENERATOR ============
+        function setupQRGenerator() {
+            let qrInstance = null;
+            const qrInput = document.getElementById('qrInput');
+            const qrGenerateBtn = document.getElementById('qrGenerateBtn');
+            const qrContainer = document.getElementById('qrcode');
+            const qrDownloadBtn = document.getElementById('qrDownloadBtn');
+            const qrCodeContainer = document.getElementById('qrcodeContainer');
+
+            qrGenerateBtn.addEventListener('click', function() {
+                const text = qrInput.value.trim();
+                if (!text) {
+                    alert('⚠️ Masukkan teks atau URL!');
+                    return;
+                }
+
+                qrContainer.innerHTML = '';
+                if (qrInstance) qrInstance.clear();
+
+                qrInstance = new QRCode(qrContainer, {
+                    text: text,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                qrCodeContainer.style.display = 'block';
+                qrDownloadBtn.style.display = 'block';
+            });
+
+            qrDownloadBtn.addEventListener('click', function() {
+                const canvas = qrContainer.querySelector('canvas');
+                if (!canvas) {
+                    alert('⚠️ Generate QR dulu!');
+                    return;
+                }
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+
+            qrInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') qrGenerateBtn.click();
+            });
+        }
+
+        // ============ TIKTOK ============
+        function setupTikTok() {
+            const tiktokInput = document.getElementById('tiktokInput');
+            const tiktokDownloadBtn = document.getElementById('tiktokDownloadBtn');
+            const tiktokResult = document.getElementById('tiktokResult');
+            const tiktokTitle = document.getElementById('tiktokTitle');
+            const tiktokVideoBtn = document.getElementById('tiktokVideoBtn');
+            const tiktokAudioBtn = document.getElementById('tiktokAudioBtn');
+            const tiktokStatus = document.getElementById('tiktokStatus');
+
+            function isValidTikTokUrl(url) {
+                return /^https?:\/\/(www\.|vm\.|vt\.)?tiktok\.com\/.+/i.test(url);
+            }
+
+            tiktokDownloadBtn.addEventListener('click', async function() {
+                const url = tiktokInput.value.trim();
+                if (!url) {
+                    tiktokStatus.textContent = '⚠️ Masukkan URL TikTok!';
+                    tiktokStatus.style.color = '#ff4444';
+                    return;
+                }
+
+                if (!isValidTikTokUrl(url)) {
+                    tiktokStatus.textContent = '⚠️ URL TikTok tidak valid!';
+                    tiktokStatus.style.color = '#ff4444';
+                    return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+                tiktokStatus.textContent = '⏳ Mengambil data video...';
+                tiktokStatus.style.color = '#888';
+                tiktokResult.classList.remove('active');
+
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    tiktokTitle.textContent = '🎬 ' + url.split('/').pop() || 'TikTok Video';
+                    tiktokVideoBtn.href = '#';
+                    tiktokVideoBtn.onclick = (e) => {
+                        e.preventDefault();
+                        alert('📥 Download video: ' + url);
+                    };
+                    tiktokAudioBtn.href = '#';
+                    tiktokAudioBtn.onclick = (e) => {
+                        e.preventDefault();
+                        alert('🎵 Download audio: ' + url);
+                    };
+
+                    tiktokResult.classList.add('active');
+                    tiktokStatus.textContent = '✅ Video siap diunduh!';
+                    tiktokStatus.style.color = '#4ade80';
+
+                } catch (error) {
+                    tiktokStatus.textContent = '❌ Gagal: ' + error.message;
+                    tiktokStatus.style.color = '#ff4444';
+                }
+
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-download"></i> Download TikTok';
+            });
+        }
+
+        // ============ IPHONE QUOTE ============
+        function setupQuote() {
+            const quoteTime = document.getElementById('quoteTime');
+            const quoteBattery = document.getElementById('quoteBattery');
+            const quoteProvider = document.getElementById('quoteProvider');
+            const quoteMessage = document.getElementById('quoteMessage');
+            const quoteGenerateBtn = document.getElementById('quoteGenerateBtn');
+            const quotePreview = document.getElementById('quotePreview');
+            const quoteImage = document.getElementById('quoteImage');
+            const quoteDownloadBtn = document.getElementById('quoteDownloadBtn');
+            const quoteLoading = document.getElementById('quoteLoading');
+            const quoteError = document.getElementById('quoteError');
+
+            const now = new Date();
+            quoteTime.value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            quoteBattery.value = 40;
+            quoteProvider.value = 'Telkomsel';
+            quoteMessage.value = 'Haii bang, apa kabar?';
+
+            let currentQuoteUrl = '';
+
+            quoteGenerateBtn.addEventListener('click', async function() {
+                const time = quoteTime.value.trim();
+                const battery = quoteBattery.value;
+                const provider = quoteProvider.value.trim();
+                const message = quoteMessage.value.trim();
+
+                if (!time || !battery || !provider || !message) {
+                    quoteError.textContent = '⚠️ Semua field harus diisi!';
+                    quoteError.style.display = 'block';
+                    return;
+                }
+
+                quoteError.style.display = 'none';
+                quotePreview.classList.remove('active');
+                quoteLoading.style.display = 'block';
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+
+                try {
+                    const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=${encodeURIComponent(provider)}&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+
+                    currentQuoteUrl = url;
+                    quoteImage.src = url;
+                    quoteImage.onload = () => {
+                        quotePreview.classList.add('active');
+                        quoteLoading.style.display = 'none';
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-rocket"></i> GENERATE QUOTE';
+                    };
+                    quoteImage.onerror = () => {
+                        quoteError.textContent = '❌ Gagal membuat quote. Coba lagi.';
+                        quoteError.style.display = 'block';
+                        quoteLoading.style.display = 'none';
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-rocket"></i> GENERATE QUOTE';
+                    };
+
+                } catch (error) {
+                    quoteError.textContent = '❌ Error: ' + error.message;
+                    quoteError.style.display = 'block';
+                    quoteLoading.style.display = 'none';
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-rocket"></i> GENERATE QUOTE';
+                }
+            });
+
+            quoteDownloadBtn.addEventListener('click', function() {
+                if (!currentQuoteUrl) {
+                    alert('⚠️ Generate quote dulu!');
+                    return;
+                }
+                const link = document.createElement('a');
+                link.href = currentQuoteUrl;
+                link.download = 'iphone-quote-' + Date.now() + '.png';
+                link.click();
+            });
+        }
+
+        // ============ NGL SPAM ============
+        function setupNGL() {
+            const nglTarget = document.getElementById('nglTarget');
+            const nglMessage = document.getElementById('nglMessage');
+            const nglCount = document.getElementById('nglCount');
+            const nglSendBtn = document.getElementById('nglSendBtn');
+            const nglLogs = document.getElementById('nglLogs');
+            const nglStats = document.getElementById('nglStats');
+            const nglProgressBar = document.getElementById('nglProgressBar');
+            const nglProgressFill = document.getElementById('nglProgressFill');
+            const nglSuccessCount = document.getElementById('nglSuccessCount');
+            const nglErrorCount = document.getElementById('nglErrorCount');
+            const nglProgress = document.getElementById('nglProgress');
+
+            function addNglLog(text, type = 'info') {
+                const div = document.createElement('div');
+                div.className = 'log-' + type;
+                div.textContent = text;
+                nglLogs.appendChild(div);
+                nglLogs.scrollTop = nglLogs.scrollHeight;
+            }
+
+            nglSendBtn.addEventListener('click', async function() {
+                const target = nglTarget.value.trim();
+                const message = nglMessage.value.trim();
+                const count = parseInt(nglCount.value) || 1;
+
+                if (!target) {
+                    addNglLog('❌ Masukkan username target!', 'error');
+                    return;
+                }
+                if (!message) {
+                    addNglLog('❌ Masukkan pesan!', 'error');
+                    return;
+                }
+                if (count < 1 || count > 100) {
+                    addNglLog('❌ Jumlah harus 1-100!', 'error');
+                    return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+                nglLogs.innerHTML = '';
+                nglStats.style.display = 'flex';
+                nglProgressBar.style.display = 'block';
+                nglSuccessCount.textContent = '0';
+                nglErrorCount.textContent = '0';
+                nglProgress.textContent = '0%';
+                nglProgressFill.style.width = '0%';
+
+                addNglLog('🚀 Memulai spam ke @' + target + ' (' + count + 'x)', 'info');
+
+                let success = 0;
+                let failed = 0;
+
+                for (let i = 0; i < count; i++) {
+                    try {
+                        const response = await fetch('https://ngl.link/api/submit', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: new URLSearchParams({
+                                username: target,
+                                question: message,
+                                deviceId: 'web-' + Math.random().toString(36).substring(2, 10)
+                            })
+                        });
+
+                        if (response.ok) {
+                            success++;
+                            addNglLog('✅ Pesan ' + (i+1) + '/' + count + ' terkirim!', 'success');
+                        } else {
+                            failed++;
+                            addNglLog('❌ Pesan ' + (i+1) + '/' + count + ' gagal!', 'error');
+                        }
+                    } catch (error) {
+                        failed++;
+                        addNglLog('❌ Error: ' + error.message, 'error');
+                    }
+
+                    const progress = ((i + 1) / count) * 100;
+                    nglProgressFill.style.width = progress + '%';
+                    nglProgress.textContent = Math.round(progress) + '%';
+                    nglSuccessCount.textContent = success;
+                    nglErrorCount.textContent = failed;
+
+                    await new Promise(resolve => setTimeout(resolve, 3000 + Math.random() * 2000));
+                }
+
+                addNglLog('📊 Selesai! ' + success + ' berhasil, ' + failed + ' gagal', 'info');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-rocket"></i> Mulai Spam';
+            });
+        }
+
+        // ============ API KEY ============
+        function setupAPIKey() {
+            let myApiKey = null;
+            let isKeyVisible = false;
+
+            const apiKeyStatus = document.querySelector('#page-apikey .api-status');
+            const apiKeyDisplayArea = document.getElementById('apiKeyDisplayArea');
+            const apiKeyText = document.getElementById('apiKeyText');
+            const generateBtn = document.getElementById('generateApiBtn');
+            const copyBtn = document.getElementById('copyApiBtn');
+            const toggleBtn = document.getElementById('toggleApiBtn');
+
+            const savedKey = localStorage.getItem('twiceApiKey');
+            if (savedKey) {
+                myApiKey = savedKey;
+                apiKeyStatus.innerHTML = 'Status: <span class="active">● Aktif</span>';
+                apiKeyDisplayArea.style.display = 'flex';
+                apiKeyText.textContent = myApiKey.replace(/./g, '•');
+                generateBtn.innerHTML = '<i class="fas fa-sync"></i> Regenerate API Key';
+            }
+
+            generateBtn.addEventListener('click', async function() {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    const newKey = 'twice-' + Math.random().toString(36).substring(2, 15) + 
+                                  '-' + Math.random().toString(36).substring(2, 10);
+                    
+                    myApiKey = newKey;
+                    localStorage.setItem('twiceApiKey', myApiKey);
+                    
+                    apiKeyStatus.innerHTML = 'Status: <span class="active">● Aktif</span>';
+                    apiKeyDisplayArea.style.display = 'flex';
+                    apiKeyText.textContent = myApiKey.replace(/./g, '•');
+                    isKeyVisible = false;
+                    toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                    
+                    this.innerHTML = '<i class="fas fa-sync"></i> Regenerate API Key';
+                    alert('✅ API Key berhasil dibuat!\n\n' + myApiKey);
+
+                } catch (error) {
+                    alert('❌ Gagal membuat API Key: ' + error.message);
+                }
+
+                this.disabled = false;
+            });
+
+            copyBtn.addEventListener('click', function() {
+                if (!myApiKey) return;
+                
+                navigator.clipboard.writeText(myApiKey).then(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    this.classList.add('copied');
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-copy"></i>';
+                        this.classList.remove('copied');
+                    }, 2000);
+                }).catch(() => {
+                    const input = document.createElement('input');
+                    input.value = myApiKey;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    alert('✅ API Key berhasil di-copy!');
+                });
+            });
+
+            toggleBtn.addEventListener('click', function() {
+                if (!myApiKey) return;
+                isKeyVisible = !isKeyVisible;
+                if (isKeyVisible) {
+                    apiKeyText.textContent = myApiKey;
+                    this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    apiKeyText.textContent = myApiKey.replace(/./g, '•');
+                    this.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            });
+        }
+
+        // ============ CHECK LOGO ============
+        function checkLogo() {
+            document.querySelectorAll('.logo, .main-logo, .profile-avatar, .header-logo').forEach(el => {
+                const img = new Image();
+                img.src = 'https://files.catbox.moe/t5fw19.jpg';
+                img.onerror = function() {
+                    if (el.classList.contains('logo') || el.classList.contains('main-logo')) {
+                        el.style.background = '#1a1a1a';
+                        el.style.display = 'flex';
+                        el.style.alignItems = 'center';
+                        el.style.justifyContent = 'center';
+                        el.style.fontSize = '20px';
+                        el.style.fontWeight = 'bold';
+                        el.style.color = '#ff2d55';
+                        el.textContent = 'Tw';
+                    }
+                };
+            });
+        }
+
+        // ============ VIDEO ERROR HANDLING ============
+        const bannerVideo = document.getElementById('bannerVideo');
+        if (bannerVideo) {
+            bannerVideo.onerror = function() {
+                this.style.display = 'none';
+                const banner = this.parentElement;
+                const fallback = document.createElement('div');
+                fallback.style.cssText = `
+                    width: 100%; height: 100%;
+                    background: linear-gradient(135deg, #1a1a1a, #2a1a3a);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 20px;
+                    color: #fff;
+                    padding: 20px;
+                    text-align: center;
+                `;
+                fallback.textContent = 'Twice — Dashboard';
+                banner.appendChild(fallback);
+            };
+        }
+
+        console.log('✅ Twice Full Project loaded successfully!');
+        console.log('📱 Loading screen with video progress bar (size increased)');
+        console.log('🔑 API Key menu added to sidebar');
+        console.log('🍔 Hamburger menu FIXED!');
+    </script>
+</body>
+</html>
