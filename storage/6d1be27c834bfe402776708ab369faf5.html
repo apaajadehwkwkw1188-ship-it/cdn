@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifikasi Task — ZynxLoopie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --bg: #060913;
+      --surface: #0c1225;
+      --surface2: #121b35;
+      --border: #1a2744;
+      --border2: #263963;
+      --accent: #6c8ef5;
+      --accent2: #9b72f5;
+      --gold: #f0c040;
+      --text: #e4eaf6;
+      --muted: #5a6e8a;
+      --danger: #f04444;
+      --success: #22c97a;
+      --warn: #f97316;
+      --radius: 16px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, .45);
+      --transition: all .25s cubic-bezier(.4, 0, .2, 1);
+    }
+    body {
+      background: var(--bg);
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image: radial-gradient(ellipse at 30% 40%, rgba(108, 142, 245, .04) 0%, transparent 60%);
+    }
+    .task-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      max-width: 620px;
+      width: 100%;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .task-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: .5;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subhead {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      border-left: 3px solid var(--border);
+      padding-left: 14px;
+    }
+    .user-input-area {
+      margin-bottom: 18px;
+    }
+    .user-input-area label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .user-input-area input {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: var(--transition);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .user-input-area input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(108, 142, 245, .15);
+    }
+    .user-suggest {
+      margin-top: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: none;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .user-suggest .suggest-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-suggest .suggest-item:hover {
+      background: var(--surface2);
+    }
+    .user-suggest .suggest-item:last-child {
+      border-bottom: none;
+    }
+    .user-suggest .suggest-item .s-username {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .user-suggest .suggest-item .s-points {
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+    .selected-user {
+      background: var(--surface2);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 10px 0 16px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .selected-user .su-name {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 15px;
+    }
+    .selected-user .su-pts {
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+    }
+    .clear-user {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 4px;
+      transition: var(--transition);
+    }
+    .clear-user:hover {
+      transform: scale(1.2);
+    }
+    .detail-box {
+      background: rgba(0, 0, 0, .25);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(26, 39, 68, .4);
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .detail-value {
+      font-weight: 500;
+      font-size: 15px;
+      text-align: right;
+    }
+    .detail-value.code {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+    }
+    .detail-value.reward {
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .status-box {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      display: none;
+      margin: 14px 0;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-box.show {
+      display: flex;
+    }
+    .status-box.success {
+      background: rgba(34, 201, 122, .10);
+      border: 1px solid rgba(34, 201, 122, .25);
+      color: var(--success);
+    }
+    .status-box.error {
+      background: rgba(240, 68, 68, .10);
+      border: 1px solid rgba(240, 68, 68, .25);
+      color: var(--danger);
+    }
+    .status-box.info {
+      background: rgba(108, 142, 245, .08);
+      border: 1px solid rgba(108, 142, 245, .20);
+      color: var(--accent);
+    }
+    .status-box.warning {
+      background: rgba(249, 115, 22, .08);
+      border: 1px solid rgba(249, 115, 22, .20);
+      color: var(--warn);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      background: linear-gradient(135deg, var(--success), #16a34a);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(34, 201, 122, .25);
+    }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(34, 201, 122, .35);
+    }
+    .btn-submit:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    .btn-submit .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, .2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .footer-note {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .footer-note a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 480px) {
+      .task-card {
+        padding: 24px 18px;
+      }
+      .header h1 {
+        font-size: 20px;
+      }
+      .detail-value.reward {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="task-card">
+    <div class="header">
+      <span style="font-size:28px;">⚡</span>
+      <h1>ZynxLoopie Task</h1>
+    </div>
+    <div class="subhead">Verifikasi penyelesaian misi shortlink</div>
+
+    <!-- ===== INPUT USERNAME ===== -->
+    <div class="user-input-area">
+      <label for="usernameInput">🔍 Cari Username (Wajib diisi)</label>
+      <input type="text" id="usernameInput" placeholder="Ketik username..." oninput="window.searchUser(this.value)">
+      <div class="user-suggest" id="userSuggest"></div>
+    </div>
+
+    <!-- ===== USER TERPILIH ===== -->
+    <div class="selected-user" id="selectedUserDisplay">
+      <div>
+        <span class="su-name" id="selectedUserName">—</span>
+        <span style="font-size:12px;color:var(--muted);"> | Poin: </span>
+        <span class="su-pts" id="selectedUserPts">0</span>
+      </div>
+      <button class="clear-user" onclick="window.clearSelectedUser()">✕</button>
+    </div>
+
+    <!-- ===== DETAIL TASK ===== -->
+    <div class="detail-box" id="detailBox">
+      <div class="detail-row">
+        <span class="detail-label">Kode Task</span>
+        <span class="detail-value code" id="taskCodeDisplay">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Hadiah Poin</span>
+        <span class="detail-value reward" id="taskRewardDisplay">0</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Deskripsi</span>
+        <span class="detail-value" id="taskDescDisplay" style="font-weight:400;font-size:14px;">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <span class="detail-value" id="taskStatusDisplay" style="font-size:13px;">Memuat...</span>
+      </div>
+    </div>
+
+    <!-- ===== STATUS BOX ===== -->
+    <div class="status-box" id="statusBox">
+      <span id="statusIcon">ℹ️</span>
+      <span id="statusText">Pesan status</span>
+    </div>
+
+    <!-- ===== TOMBOL SUBMIT ===== -->
+    <button class="btn-submit" id="submitBtn" disabled onclick="window.submitClaim()">
+      📤 Kirim Klaim ke Admin
+    </button>
+
+    <div class="footer-note">
+      Pastikan Anda sudah login di <a href="dashboard.html" target="_blank">dashboard</a>.<br>
+      Klik tombol di atas untuk mengirim laporan ke admin.
+    </div>
+  </div>
+
+  <script type="module">
+    // ================================================================
+    // IMPOR FIREBASE
+    // ================================================================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // ================================================================
+    // FIREBASE CONFIG
+    // ================================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDAIE0aOA9UMAX0ADeomoGOTnHvzO2R5iY",
+      authDomain: "zynxloopy.my.id",
+      databaseURL: "https://zynxslink-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "zynxslink",
+      storageBucket: "zynxslink.firebasestorage.app",
+      messagingSenderId: "315830231289",
+      appId: "1:315830231289:web:779d6493bfc316aeff8228",
+      measurementId: "G-D4334H41FM"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ================================================================
+    // AMBIL PARAMETER URL (taskcode)
+    // ================================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskcode = urlParams.get('taskcode');
+
+    // ================================================================
+    // DOM ELEMENTS
+    // ================================================================
+    const usernameInput = document.getElementById('usernameInput');
+    const userSuggest = document.getElementById('userSuggest');
+    const selectedUserDisplay = document.getElementById('selectedUserDisplay');
+    const selectedUserName = document.getElementById('selectedUserName');
+    const selectedUserPts = document.getElementById('selectedUserPts');
+    const taskCodeDisplay = document.getElementById('taskCodeDisplay');
+    const taskRewardDisplay = document.getElementById('taskRewardDisplay');
+    const taskDescDisplay = document.getElementById('taskDescDisplay');
+    const taskStatusDisplay = document.getElementById('taskStatusDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusBox = document.getElementById('statusBox');
+    const statusIcon = document.getElementById('statusIcon');
+    const statusText = document.getElementById('statusText');
+
+    // ================================================================
+    // STATE
+    // ================================================================
+    let allUsers = {};
+    let currentTask = null;
+    let selectedUser = null;
+    let isClaimPending = false;
+    let claimId = null;
+    let isTaskValid = false;
+
+    // ================================================================
+    // HELPERS
+    // ================================================================
+    function showStatus(type, message, icon = 'ℹ️') {
+      statusBox.className = 'status-box show ' + type;
+      statusIcon.textContent = icon;
+      statusText.textContent = message;
+    }
+    function hideStatus() {
+      statusBox.className = 'status-box';
+    }
+
+    // ================================================================
+    // AUTOCOMPLETE - GLOBAL
+    // ================================================================
+    window.searchUser = function(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) { userSuggest.style.display = 'none'; return; }
+      const filtered = Object.entries(allUsers).filter(([u]) => u.toLowerCase().includes(q));
+      if (!filtered.length) {
+        userSuggest.innerHTML = '<div style="padding:12px 16px;color:var(--muted);">Tidak ditemukan</div>';
+        userSuggest.style.display = 'block';
+        return;
+      }
+      userSuggest.innerHTML = filtered.map(([username, data]) => `
+        <div class="suggest-item" onclick="window.selectUser('${username}')">
+          <span class="s-username">${username}</span>
+          <span class="s-points">🪙 ${data.points || 0}</span>
+        </div>
+      `).join('');
+      userSuggest.style.display = 'block';
+    };
+
+    // ================================================================
+    // SELECT USER - GLOBAL
+    // ================================================================
+    window.selectUser = function(username) {
+      const data = allUsers[username];
+      if (!data) { showStatus('error', 'User tidak ditemukan.', '❌'); return; }
+      selectedUser = { username, points: data.points || 0 };
+      selectedUserName.textContent = username;
+      selectedUserPts.textContent = selectedUser.points;
+      selectedUserDisplay.style.display = 'flex';
+      userSuggest.style.display = 'none';
+      usernameInput.value = username;
+      checkUserClaimStatus(username);
+    };
+
+    window.clearSelectedUser = function() {
+      selectedUser = null;
+      selectedUserDisplay.style.display = 'none';
+      usernameInput.value = '';
+      submitBtn.disabled = true;
+      submitBtn.textContent = '📤 Kirim Klaim ke Admin';
+      hideStatus();
+    };
+
+    // ================================================================
+    // LOAD TASK (query by taskcode)
+    // ================================================================
+    async function loadTask() {
+      if (!taskcode) {
+        taskStatusDisplay.textContent = '❌ Task code tidak ditemukan.';
+        taskStatusDisplay.style.color = 'var(--danger)';
+        showStatus('error', 'Parameter taskcode tidak ada di URL.', '❌');
+        submitBtn.disabled = true;
+        isTaskValid = false;
+        return false;
+      }
+      try {
+        const snap = await get(ref(db, 'tasks/' + taskcode));
+        if (!snap.exists()) {
+          taskStatusDisplay.textContent = '❌ Task tidak ditemukan.';
+          taskStatusDisplay.style.color = 'var(--danger)';
+          showStatus('error', 'Task dengan kode "' + taskcode + '" tidak ditemukan di Firebase.', '❌');
+          submitBtn.disabled = true;
+          isTaskValid = false;
+          return false;
+        }
+        const task = snap.val();
+        currentTask = task;
+        taskCodeDisplay.textContent = task.code || taskcode;
+        taskRewardDisplay.textContent = task.reward || 0;
+        taskDescDisplay.textContent = task.title || 'Selesaikan misi ini.';
+
+        if (task.expireAt && task.expireAt < Date.now()) {
+          taskStatusDisplay.textContent = '⏰ Kadaluarsa';
+          taskStatusDisplay.style.color = 'var(--danger)';
+          showStatus('error', 'Task ini sudah kadaluarsa.', '⏰');
+          submitBtn.disabled = true;
+          isTaskValid = false;
+          return false;
+        }
+        if (!task.active) {
+          taskStatusDisplay.textContent = '⛔ Tidak aktif';
+          taskStatusDisplay.style.color = 'var(--danger)';
+          showStatus('error', 'Task tidak aktif.', '⛔');
+          submitBtn.disabled = true;
+          isTaskValid = false;
+          return false;
+        }
+        taskStatusDisplay.textContent = '✅ Aktif';
+        taskStatusDisplay.style.color = 'var(--success)';
+        isTaskValid = true;
+        if (selectedUser) await checkUserClaimStatus(selectedUser.username);
+        return true;
+      } catch (e) {
+        console.error(e);
+        taskStatusDisplay.textContent = '❌ Gagal memuat task.';
+        showStatus('error', 'Gagal membaca data: ' + e.message, '❌');
+        submitBtn.disabled = true;
+        isTaskValid = false;
+        return false;
+      }
+    }
+
+    // ================================================================
+    // CHECK USER CLAIM STATUS
+    // ================================================================
+    async function checkUserClaimStatus(username) {
+      if (!username || !taskcode || !isTaskValid) return;
+      try {
+        // Cek apakah sudah selesai (completedTaskIds)
+        const completedSnap = await get(ref(db, 'users/' + username + '/completedTaskIds/' + taskcode));
+        if (completedSnap.exists()) {
+          showStatus('info', '✅ User ini sudah menyelesaikan task ini.', '✅');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Sudah selesai';
+          return;
+        }
+
+        // Cek klaim pending
+        const claimsSnap = await get(ref(db, 'taskClaims'));
+        if (claimsSnap.exists()) {
+          const claims = Object.values(claimsSnap.val());
+          const pending = claims.find(c => c.username === username && c.taskcode === taskcode && c.status === 'pending');
+          if (pending) {
+            isClaimPending = true;
+            claimId = pending.id;
+            showStatus('info', '⏳ User ini sudah mengirim klaim. Tunggu admin.', '⏳');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Menunggu verifikasi';
+            listenClaimStatus(pending.id);
+            return;
+          }
+          const approved = claims.find(c => c.username === username && c.taskcode === taskcode && c.status === 'approved');
+          if (approved) {
+            showStatus('success', '✅ Task sudah selesai untuk user ini.', '✅');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Selesai ✅';
+            return;
+          }
+        }
+        // Aktifkan tombol
+        submitBtn.disabled = false;
+        submitBtn.textContent = '📤 Kirim Klaim ke Admin';
+        hideStatus();
+      } catch (e) {
+        console.error(e);
+        showStatus('error', 'Gagal cek status: ' + e.message, '❌');
+        submitBtn.disabled = true;
+      }
+    }
+
+    // ================================================================
+    // REAL-TIME LISTENER KLAIM
+    // ================================================================
+    function listenClaimStatus(claimId) {
+      const claimRef = ref(db, 'taskClaims/' + claimId);
+      onValue(claimRef, (snap) => {
+        if (!snap.exists()) return;
+        const claim = snap.val();
+        if (claim.status === 'approved') {
+          showStatus('success', '✅ Klaim disetujui! Poin sudah masuk.', '🎉');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Selesai ✅';
+          taskStatusDisplay.textContent = '✅ Selesai';
+          taskStatusDisplay.style.color = 'var(--success)';
+        } else if (claim.status === 'rejected') {
+          showStatus('error', '❌ Klaim ditolak. Silakan coba lagi.', '❌');
+          submitBtn.disabled = false;
+          submitBtn.textContent = '📤 Kirim Klaim ke Admin';
+          isClaimPending = false;
+          claimId = null;
+        }
+      });
+    }
+
+    // ================================================================
+    // SUBMIT CLAIM - GLOBAL
+    // ================================================================
+    window.submitClaim = async function() {
+      if (!selectedUser) {
+        showStatus('warning', 'Pilih user terlebih dahulu!', '⚠️');
+        return;
+      }
+      if (!taskcode || !currentTask || !isTaskValid) {
+        showStatus('error', 'Task tidak valid.', '❌');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Mengirim...';
+
+      try {
+        // Cek duplikat
+        const claimsSnap = await get(ref(db, 'taskClaims'));
+        let already = false;
+        if (claimsSnap.exists()) {
+          const claims = Object.values(claimsSnap.val());
+          already = claims.some(c => c.username === selectedUser.username && c.taskcode === taskcode && c.status === 'pending');
+        }
+        if (already) {
+          showStatus('info', '⏳ User ini sudah mengirim klaim.', '⏳');
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = 'Menunggu verifikasi';
+          return;
+        }
+
+        const claimRef = push(ref(db, 'taskClaims'));
+        await set(claimRef, {
+          id: claimRef.key,
+          username: selectedUser.username,
+          taskcode: taskcode,
+          status: 'pending',
+          timestamp: Date.now(),
+          authCode: taskcode
+        });
+
+        await push(ref(db, 'logs'), {
+          msg: `User <b>${selectedUser.username}</b> mengirim klaim task <b>${taskcode}</b>`,
+          ts: Date.now(),
+          time: new Date().toLocaleTimeString('id-ID')
+        });
+
+        showStatus('success', '✅ Klaim berhasil dikirim! Tunggu admin.', '📨');
+        submitBtn.innerHTML = '📤 Terkirim';
+        submitBtn.disabled = true;
+        isClaimPending = true;
+        claimId = claimRef.key;
+        listenClaimStatus(claimRef.key);
+
+      } catch (e) {
+        console.error(e);
+        showStatus('error', 'Gagal mengirim: ' + e.message, '❌');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '📤 Kirim Klaim ke Admin';
+      }
+    };
+
+    // ================================================================
+    // INIT
+    // ================================================================
+    (async function init() {
+      try {
+        // 1. Load users
+        const userSnap = await get(ref(db, 'users'));
+        if (userSnap.exists()) allUsers = userSnap.val();
+
+        // 2. Load task
+        await loadTask();
+
+        // 3. Auto-select if user exists in session
+        const storedUser = sessionStorage.getItem('zl_user');
+        if (storedUser && allUsers[storedUser] && isTaskValid) {
+          window.selectUser(storedUser);
+        }
+
+        console.log('✅ task.html loaded. Task code:', taskcode);
+      } catch (e) {
+        console.error('Init error:', e);
+        showStatus('error', 'Gagal memuat data awal.', '❌');
+      }
+    })();
+  </script>
+</body>
+</html>
