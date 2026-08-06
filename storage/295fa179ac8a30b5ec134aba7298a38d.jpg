@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AL | Frontend Developer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==================== 1. WARNA DASAR & RESET ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #111111;
+            --text-soft: #666666;
+            --accent-blue: #5aa9ff;
+            --accent-blue-light: #dceeff;
+            --grid-line: rgba(90, 169, 255, 0.15);
+            --border-color: #eeeeee;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* ==================== 2. BACKGROUND GRID BIRU MUDA ==================== */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ==================== 3. NAVBAR ==================== */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            padding: 16px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s ease;
+        }
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
+        
+        .nav-links { display: none; gap: 30px; align-items: center; }
+        .nav-links a { color: var(--text-soft); font-weight: 600; font-size: 0.95rem; position: relative; }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+            background: var(--accent-blue); transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+        .nav-links a:hover::after { width: 100%; }
+        
+        .btn-hire { background: var(--accent-blue); color: white !important; padding: 8px 20px; border-radius: 50px; font-weight: 700; }
+        .btn-hire:hover { background: #4686d6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(90, 169, 255, 0.3); }
+        .btn-hire::after { display: none !important; }
+
+        .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 5px; }
+        .hamburger span { display: block; width: 24px; height: 2px; background: var(--text-main); transition: 0.3s; }
+
+        /* Mobile Menu */
+        .mobile-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1001;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .mobile-menu {
+            position: fixed; top: 0; right: -100%; width: 70%; max-width: 300px; height: 100vh;
+            background: white; z-index: 1002; padding: 80px 30px; box-shadow: -5px 0 20px rgba(0,0,0,0.05);
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; gap: 24px;
+        }
+        .mobile-menu a { font-weight: 600; font-size: 1.1rem; color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        .mobile-menu.active { right: 0; }
+        .mobile-overlay.active { opacity: 1; visibility: visible; }
+
+        /* ==================== 4. HERO SECTION ==================== */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .section { padding: 60px 0; }
+
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; text-align: center; padding: 120px 20px 40px; position: relative;
+        }
+
+        /* Animasi Awal */
+        .reveal { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; } .d3 { animation-delay: 0.3s; }
+        .d4 { animation-delay: 0.4s; } .d5 { animation-delay: 0.5s; } .d6 { animation-delay: 0.6s; }
+
+        .badge {
+            display: inline-block; background: var(--accent-blue-light); color: var(--accent-blue);
+            padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 10vw, 5.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -1px;
+        }
+        .hero h1 .highlight { color: var(--accent-blue); }
+        .hero h2 {
+            font-size: clamp(2rem, 7vw, 4rem); font-weight: 800; color: #b0b0b0; line-height: 1.1; margin-top: 4px;
+        }
+        .hero p {
+            color: var(--text-soft); font-size: clamp(1rem, 2vw, 1.15rem); max-width: 450px; 
+            margin: 16px auto 28px; line-height: 1.6;
+        }
+
+        .buttons { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; display: inline-block; cursor: pointer; }
+        .btn-primary { background: var(--accent-blue); color: white; box-shadow: 0 4px 14px rgba(90, 169, 255, 0.25); }
+        .btn-primary:hover { transform: translateY(-3px); background: #4686d6; box-shadow: 0 6px 20px rgba(90, 169, 255, 0.4); }
+        .btn-outline { border: 1px solid #e5e7eb; color: var(--text-main); background: white; }
+        .btn-outline:hover { border-color: var(--accent-blue); background: #f8faff; transform: translateY(-3px); }
+
+        /* --- FOTO STIKER & FLOATING ICONS --- */
+        .hero-img-wrapper {
+            position: relative; margin-top: 50px; width: 180px; height: 180px;
+        }
+        .profile-pic {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 20px;
+            /* Rahasia Stiker Outline Putih: */
+            filter: drop-shadow(0 0 0 12px white) drop-shadow(0 0 0 12px white) drop-shadow(0 12px 24px rgba(0,0,0,0.08));
+            transition: transform 0.4s ease;
+        }
+        .profile-pic:hover { transform: scale(1.03) rotate(-2deg); }
+
+        /* Floating Icons Playful */
+        .float-icon {
+            position: absolute; font-size: 1.8rem; user-select: none; pointer-events: none;
+            animation: floatAnim 4s ease-in-out infinite;
+        }
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(8deg); }
+        }
+        .fi-1 { top: -20px; right: -20px; animation-delay: 0s; }
+        .fi-2 { bottom: -10px; left: -25px; animation-delay: 1.5s; font-size: 2.2rem; }
+        .fi-3 { top: 20px; left: -20px; animation-delay: 3s; font-size: 1.2rem; }
+
+        /* ==================== 5. SECTIONS UMUM ==================== */
+        .section-title { 
+            font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; text-align: center; margin-bottom: 40px; 
+            color: var(--text-main);
+        }
+
+        .card-grid { display: grid; gap: 20px; }
+        .card {
+            background: white; border: 1px solid var(--border-color); border-radius: 20px;
+            padding: 24px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+
+        /* ==================== 6. SKILLS ==================== */
+        .skills-grid { grid-template-columns: repeat(2, 1fr); }
+        .skill-item {
+            display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.95rem;
+        }
+        .skill-icon { width: 32px; height: 32px; background: var(--accent-blue-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+        /* ==================== 7. PROJECTS ==================== */
+        .projects-grid { grid-template-columns: 1fr; }
+        .project-tech { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+        .project-tech span {
+            background: #f5f7fa; color: var(--text-soft);
+            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+        }
+        .project-actions { display: flex; gap: 12px; }
+        .project-actions .btn { padding: 8px 16px; font-size: 0.85rem; }
+
+        /* ==================== 8. CONTACT & FOOTER ==================== */
+        .contact-box { text-align: center; border: 1px solid var(--border-color); border-radius: 24px; padding: 40px 20px; background: white; max-width: 600px; margin: 0 auto; }
+        .contact-box h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .contact-box p { color: var(--text-soft); margin-bottom: 24px; }
+
+        footer { border-top: 1px solid var(--border-color); padding: 40px 0; text-align: center; color: var(--text-soft); font-size: 0.9rem; margin-top: 40px; }
+        footer .logo { display: block; margin-bottom: 8px; color: var(--text-main); }
+        footer .socials { display: flex; justify-content: center; gap: 24px; margin: 16px 0; }
+        footer .socials a { font-size: 1.2rem; color: var(--text-soft); }
+        footer .socials a:hover { color: var(--accent-blue); }
+
+        /* ==================== 9. RESPONSIVE DESKTOP ==================== */
+        @media (min-width: 768px) {
+            .hamburger, .mobile-overlay, .mobile-menu { display: none !important; }
+            .nav-links { display: flex; }
+            
+            .hero { padding: 140px 20px 60px; flex-direction: row; text-align: left; gap: 40px; min-height: 100vh; }
+            .hero-content { flex: 1; }
+            .hero p { margin: 16px 0 28px; }
+            .buttons { justify-content: flex-start; }
+            .hero-img-wrapper { width: 280px; height: 280px; flex-shrink: 0; margin-top: 0; }
+            .fi-1 { top: -30px; right: -30px; font-size: 2.2rem; }
+            .fi-2 { bottom: -20px; left: -40px; font-size: 2.8rem; }
+            .fi-3 { top: 30px; left: -30px; font-size: 1.5rem; }
+
+            .skills-grid { grid-template-columns: repeat(4, 1fr); }
+            .projects-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND GRID -->
+    <div class="bg-grid"></div>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-overlay" id="overlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <!-- NAVBAR -->
+    <header id="header">
+        <a href="#" class="logo">AL</a>
+        <ul class="nav-links">
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#contact" class="btn-hire">Hire me</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="badge reveal d1">🚀 Available for Projects</div>
+                <h1 class="reveal d2">Hi, I'm <span class="highlight">AL</span> 👋</h1>
+                <h2 class="reveal d3">Frontend Developer</h2>
+                <p class="reveal d4">I build clean, responsive, and modern web experiences with attention to detail.</p>
+                <div class="buttons reveal d5">
+                    <a href="#projects" class="btn btn-primary">View Projects</a>
+                    <a href="#contact" class="btn btn-outline">Let's Talk</a>
+                </div>
+            </div>
+
+            <div class="hero-img-wrapper reveal d6">
+                <!-- INI FOTO ANDA (SUDAH SAYA GANTI DENGAN LINK DARI ANDA) -->
+                <img src="https://i.supaimg.com/9e13283e-6bde-4a5b-a5ff-06fed5bece25/418bc00d-c32a-45ae-b5c7-97cd748ca393.png" alt="AL Profile" class="profile-pic">
+                
+                <!-- FLOATING ICONS -->
+                <span class="float-icon fi-1">🚀</span>
+                <span class="float-icon fi-2">✨</span>
+                <span class="float-icon fi-3">⭐</span>
+            </div>
+        </section>
+
+        <!-- PROJECTS -->
+        <section id="projects" class="container section">
+            <h2 class="section-title">Selected Projects</h2>
+            <div class="card-grid projects-grid">
+                <div class="card reveal d1">
+                    <h3 style="margin-bottom: 4px;">Portfolio System</h3>
+                    <p style="color: var(--text-soft); font-size: 0.95rem;">A modular design system built for scalability and consistency across platforms.</p>
+                    <div class="project-tech"><span>React</span><span>TypeScript</span><span>Tailwind</span></div>
+                    <div class="project-actions"><a href="#" class="btn btn-primary">Live Demo</a><a href="#" class="btn btn-outline">GitHub</a></div>
+                </div>
+                <div class="card reveal d2">
+                    <h3 style="margin-bottom: 4px;">Dashboard App</h3>
+                    <p style="color: var(--text-soft); font-size: 0.95rem;">A responsive analytics dashboard designed for modern web applications.</p>
+                    <div class="project-tech"><span>Next.js</span><span>Tailwind</span><span>Framer</span></div>
+                    <div class="project-actions"><a href="#" class="btn btn-primary">Live Demo</a><a href="#" class="btn btn-outline">GitHub</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILLS -->
+        <section id="skills" class="container section">
+            <h2 class="section-title">My Skills</h2>
+            <div class="card-grid skills-grid">
+                <div class="card skill-item reveal d1"><span class="skill-icon">⚛️</span> React</div>
+                <div class="card skill-item reveal d2"><span class="skill-icon">▲</span> Next.js</div>
+                <div class="card skill-item reveal d3"><span class="skill-icon">🟦</span> TypeScript</div>
+                <div class="card skill-item reveal d4"><span class="skill-icon">🎨</span> Tailwind CSS</div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="container section">
+            <h2 class="section-title">Let's Work Together</h2>
+            <div class="contact-box reveal d1">
+                <h3>Have an idea?</h3>
+                <p>Let's build something great together.</p>
+                <a href="mailto:hello@al.dev" class="btn btn-primary" style="padding: 14px 36px;">Start a Conversation →</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="container">
+        <span class="logo">AL</span>
+        <div class="socials">
+            <a href="#">🐙 GitHub</a>
+            <a href="#">📸 Instagram</a>
+            <a href="#">🔗 LinkedIn</a>
+        </div>
+        <p>© 2026 AL. All rights reserved.</p>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // 1. NAVBAR SCROLL EFFECT
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) { header.classList.add('scrolled'); } 
+            else { header.classList.remove('scrolled'); }
+        });
+
+        // 2. MOBILE HAMBURGER MENU
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('overlay');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // 3. SCROLL REVEAL ANIMATION (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        revealElements.forEach(el => {
+            el.style.animationPlayState = 'paused'; // Jalanin animasi hanya saat kelihatan
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
