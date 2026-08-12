@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanzie Method — Panduan Self-Improvement Wajah & Penampilan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0c;
+    --bg-alt:#141416;
+    --panel:#111113;
+    --ink:#edeae3;
+    --ink-dim:#9a968d;
+    --gold:#ff2d2d;
+    --steel:#5a6b78;
+    --line:#242426;
+    --danger:#8b3a3a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--gold);color:#0b0b0c;}
+  .mono{font-family:'Space Mono',monospace;}
+  .display{font-family:'Fraunces',serif;}
+
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+
+  /* subtle grid texture across whole page */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:.18;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,11,12,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0;
+  }
+  .brand{
+    font-family:'Fraunces',serif;font-weight:700;font-size:1.15rem;
+    letter-spacing:.02em;
+    display:flex;align-items:center;gap:10px;
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
+  .nav-links{display:flex;gap:32px;font-size:.86rem;}
+  .nav-links a{color:var(--ink-dim);transition:color .2s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{
+    font-family:'Space Mono',monospace;font-size:.78rem;
+    border:1px solid var(--gold);color:var(--gold);
+    padding:9px 18px;border-radius:2px;
+    transition:background .2s, color .2s;
+  }
+  .nav-cta:hover{background:var(--gold);color:#0b0b0c;}
+  .menu-toggle{display:none;background:none;border:none;color:var(--ink);font-size:1.4rem;cursor:pointer;}
+
+  /* HERO */
+  .hero{
+    position:relative;z-index:1;
+    padding:96px 0 80px;
+    display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;
+  }
+  .eyebrow{
+    font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.18em;
+    color:var(--gold);text-transform:uppercase;margin-bottom:22px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:24px;height:1px;background:var(--gold);}
+  .hero h1{
+    font-size:clamp(3rem,7vw,5.4rem);
+    font-weight:900;
+    line-height:.92;
+    letter-spacing:-.01em;
+  }
+  .hero h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .hero p.lede{
+    margin-top:26px;max-width:480px;
+    color:var(--ink-dim);font-size:1.05rem;
+  }
+  .hero-actions{
+    margin-top:38px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  }
+  .btn-primary{
+    background:var(--gold);color:#0b0b0c;
+    font-weight:700;font-size:.92rem;
+    padding:16px 30px;border-radius:2px;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(201,162,75,.5);}
+  .price-tag{
+    font-family:'Space Mono',monospace;font-size:.82rem;color:var(--ink-dim);
+  }
+  .price-tag b{color:var(--ink);font-size:1rem;}
+
+  /* facial analysis panel — signature element */
+  .panel{
+    position:relative;
+    border:1px solid var(--line);
+    background:var(--panel);
+    aspect-ratio:4/5;
+    padding:22px;
+  }
+  .panel-label{
+    position:absolute;top:16px;left:18px;
+    font-family:'Space Mono',monospace;font-size:.66rem;
+    color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase;
+  }
+  .panel-label.br{left:auto;right:18px;top:auto;bottom:16px;text-align:right;}
+  .panel svg{width:100%;height:100%;}
+  .grid-line{stroke:var(--line);stroke-width:1;}
+  .contour{fill:none;stroke:var(--ink-dim);stroke-width:1.3;opacity:.85;}
+  .marker-line{stroke:var(--gold);stroke-width:1;stroke-dasharray:3 4;opacity:.8;}
+  .marker-dot{fill:var(--gold);}
+  .tag-text{font-family:'Space Mono',monospace;font-size:9px;fill:var(--steel);}
+  .tag-text.gold{fill:var(--gold);}
+
+  /* PROBLEM */
+  section{position:relative;z-index:1;padding:90px 0;}
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .kicker{
+    font-family:'Space Mono',monospace;font-size:.72rem;color:var(--steel);
+    letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px;
+  }
+  h2{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:1.15;}
+  h2 em{font-style:italic;color:var(--gold);font-weight:500;}
+  .lede2{color:var(--ink-dim);margin-top:16px;font-size:1.02rem;max-width:560px;}
+
+  .problem-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  .problem-card{background:var(--bg);padding:32px 28px;}
+  .problem-card .num{font-family:'Space Mono',monospace;color:var(--ink-dim);font-size:.78rem;}
+  .problem-card p{margin-top:14px;color:var(--ink-dim);font-size:.95rem;}
+
+  /* METHOD steps — sequence, numbering justified */
+  .method{background:var(--bg-alt);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .steps{display:flex;flex-direction:column;}
+  .step{
+    display:grid;grid-template-columns:120px 1fr;gap:32px;
+    padding:38px 0;border-top:1px solid var(--line);
+    align-items:start;
+  }
+  .step:first-child{border-top:none;}
+  .step .step-num{
+    font-family:'Fraunces',serif;font-weight:900;font-size:2.6rem;
+    color:transparent;-webkit-text-stroke:1px var(--gold);
+  }
+  .step h3{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;margin-bottom:10px;}
+  .step p{color:var(--ink-dim);max-width:560px;font-size:.96rem;}
+  .step .tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;}
+  .step .tags span{
+    font-family:'Space Mono',monospace;font-size:.68rem;color:var(--steel);
+    border:1px solid var(--line);padding:5px 10px;border-radius:2px;
+  }
+
+  /* INCLUDES */
+  .includes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+  .include-item{
+    border:1px solid var(--line);padding:26px;display:flex;gap:16px;align-items:flex-start;
+  }
+  .include-item .mark{color:var(--gold);font-family:'Space Mono',monospace;font-size:.9rem;}
+  .include-item h4{font-weight:600;margin-bottom:6px;font-size:1rem;}
+  .include-item p{color:var(--ink-dim);font-size:.88rem;}
+
+  /* TESTIMONIALS */
+  .testi-strip{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  .testi{background:var(--bg);padding:30px;}
+  .testi p.quote{font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;line-height:1.5;}
+  .testi .who{margin-top:18px;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--ink-dim);}
+  .testi-note{margin-top:16px;font-size:.76rem;color:var(--ink-dim);font-family:'Space Mono',monospace;}
+
+  /* PRICING */
+  .pricing-wrap{display:flex;justify-content:center;}
+  .price-card{
+    border:1px solid var(--gold);
+    background:linear-gradient(180deg, rgba(201,162,75,.08), transparent 60%);
+    padding:52px 48px;max-width:460px;width:100%;text-align:center;position:relative;
+  }
+  .price-card .corner{
+    position:absolute;top:14px;right:16px;font-family:'Space Mono',monospace;
+    font-size:.62rem;color:var(--gold);letter-spacing:.1em;
+  }
+  .toggle{
+    display:inline-flex;border:1px solid var(--line);border-radius:2px;
+    margin-bottom:30px;overflow:hidden;
+  }
+  .toggle button{
+    font-family:'Space Mono',monospace;font-size:.75rem;padding:9px 20px;
+    background:transparent;border:none;color:var(--ink-dim);cursor:pointer;
+  }
+  .toggle button.active{background:var(--gold);color:#0b0b0c;}
+  .big-price{font-family:'Fraunces',serif;font-weight:900;font-size:3.6rem;}
+  .big-price span{font-size:1.4rem;vertical-align:top;color:var(--ink-dim);}
+  .price-sub{color:var(--ink-dim);font-size:.85rem;margin-top:6px;}
+  .price-list{margin:32px 0;text-align:left;font-size:.92rem;color:var(--ink-dim);}
+  .price-list li{list-style:none;padding:10px 0;border-top:1px solid var(--line);display:flex;gap:10px;}
+  .price-list li:first-child{border-top:none;}
+  .price-list li::before{content:"—";color:var(--gold);}
+  .price-card .btn-primary{width:100%;justify-content:center;}
+  .guarantee{margin-top:18px;font-size:.76rem;color:var(--ink-dim);font-family:'Space Mono',monospace;}
+
+  /* FAQ */
+  .faq-item{border-top:1px solid var(--line);}
+  .faq-item:last-child{border-bottom:1px solid var(--line);}
+  .faq-q{
+    width:100%;text-align:left;background:none;border:none;color:var(--ink);
+    padding:24px 0;font-size:1.02rem;font-weight:600;cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;gap:20px;
+    font-family:'Inter',sans-serif;
+  }
+  .faq-q .icon{font-family:'Space Mono',monospace;color:var(--gold);font-size:1.1rem;transition:transform .25s;}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease, padding .3s ease;color:var(--ink-dim);font-size:.94rem;}
+  .faq-item.open .faq-a{max-height:220px;padding-bottom:24px;}
+  .faq-item.open .icon{transform:rotate(45deg);}
+
+  /* FOOTER CTA */
+  .final-cta{
+    text-align:center;padding:110px 0 90px;border-top:1px solid var(--line);
+  }
+  .final-cta h2{font-size:clamp(2rem,5vw,3.4rem);}
+  .final-cta .btn-primary{margin-top:32px;}
+  footer{
+    border-top:1px solid var(--line);padding:36px 0;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+  }
+  footer .disclaimer{color:var(--ink-dim);font-size:.76rem;max-width:560px;font-family:'Space Mono',monospace;}
+  footer .fbrand{font-family:'Fraunces',serif;font-weight:700;}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;padding-top:60px;}
+    .nav-links{display:none;}
+    .menu-toggle{display:block;}
+    .problem-grid{grid-template-columns:1fr;}
+    .includes-grid{grid-template-columns:1fr;}
+    .testi-strip{grid-template-columns:1fr;}
+    .step{grid-template-columns:1fr;gap:10px;}
+    .price-card{padding:40px 26px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="dot"></span>SANZIE<span style="color:var(--ink-dim);font-weight:400;">METHOD</span></div>
+    <nav class="nav-links">
+      <a href="#masalah">Masalah</a>
+      <a href="#metode">Metode</a>
+      <a href="#isi">Isi Program</a>
+      <a href="#harga">Harga</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="#harga" class="nav-cta">Gabung Sekarang</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap" style="display:contents;">
+    <div>
+      <div class="eyebrow">Panduan Self-Improvement Penampilan</div>
+      <h1>Berhenti nunggu. <em>Mulai maxing.</em></h1>
+      <p class="lede">Sanzie Method adalah panduan langkah-demi-langkah buat ningkatin penampilan lewat kebiasaan yang bisa diukur — skincare, grooming, postur, gaya, sampai kepercayaan diri. Bukan janji instan, bukan operasi.</p>
+      <div class="hero-actions">
+        <a href="https://wa.me/6281222338324?text=Halo%2C%20saya%20mau%20beli%20Sanzie%20Method" target="_blank" rel="noopener" class="btn-primary">Mulai Sekarang →</a>
+        <div class="price-tag">Investasi cuma <b>Rp 50.000</b> · akses selamanya</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">ref / 001 — analisis ilustratif</div>
+      <div class="panel-label br">sanzie.method</div>
+      <svg viewBox="0 0 320 400">
+        <line class="grid-line" x1="0" y1="100" x2="320" y2="100"/>
+        <line class="grid-line" x1="0" y1="200" x2="320" y2="200"/>
+        <line class="grid-line" x1="0" y1="300" x2="320" y2="300"/>
+        <line class="grid-line" x1="107" y1="0" x2="107" y2="400"/>
+        <line class="grid-line" x1="213" y1="0" x2="213" y2="400"/>
+        <path class="contour" d="M160 60 C110 60 90 110 92 165 C93 210 105 250 130 285 C142 302 150 315 160 320 C170 315 178 302 190 285 C215 250 227 210 228 165 C230 110 210 60 160 60 Z"/>
+        <line class="marker-line" x1="92" y1="180" x2="228" y2="180"/>
+        <circle class="marker-dot" cx="92" cy="180" r="2.5"/>
+        <circle class="marker-dot" cx="228" cy="180" r="2.5"/>
+        <text class="tag-text gold" x="234" y="178">SYMMETRY</text>
+        <line class="marker-line" x1="160" y1="60" x2="160" y2="320"/>
+        <text class="tag-text" x="164" y="45">MIDLINE</text>
+        <line class="marker-line" x1="100" y1="280" x2="220" y2="280"/>
+        <text class="tag-text" x="224" y="284">JAW REF.</text>
+        <text class="tag-text" x="20" y="380">FIG. 01 — panduan ilustrasi, bukan hasil scan pribadi</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="masalah">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Kenapa progress kamu mandek</div>
+      <h2>Random tips doang <em>nggak akan cukup.</em></h2>
+      <p class="lede2">Kebanyakan orang udah coba macem-macem — skincare mahal, olahraga wajah dari TikTok, ganti gaya rambut — tapi hasilnya nggak nyambung satu sama lain.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="num mono">01</div>
+        <p>Kamu tau harus "self-improve" tapi nggak ada urutan yang jelas harus mulai dari mana dulu.</p>
+      </div>
+      <div class="problem-card">
+        <div class="num mono">02</div>
+        <p>Info yang kamu dapet kebanyakan nggak realistis atau saling bertentangan satu sama lain.</p>
+      </div>
+      <div class="problem-card">
+        <div class="num mono">03</div>
+        <p>Nggak ada yang ngajarin cara ngerawat penampilan dengan konsisten sesuai kondisi kamu sendiri.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="method" id="metode">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Struktur Program</div>
+      <h2>5 pilar <em>Sanzie Method.</em></h2>
+      <p class="lede2">Disusun berurutan biar kamu ngerjain dari fondasi dulu, baru ke hal yang lebih kelihatan hasilnya.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num mono">01</div>
+        <div>
+          <h3>Skin Protocol</h3>
+          <p>Rutinitas skincare pagi &amp; malam yang disesuaikan sama jenis kulitmu — bukan produk mahal, tapi konsistensi yang bener.</p>
+          <div class="tags"><span>cleansing</span><span>SPF</span><span>rutinitas</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num mono">02</div>
+        <div>
+          <h3>Grooming &amp; Rambut</h3>
+          <p>Cara milih potongan rambut sesuai bentuk wajah, rapiin alis, dan grooming dasar yang sering diabaikan cowok.</p>
+          <div class="tags"><span>haircut</span><span>eyebrow</span><span>grooming kit</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num mono">03</div>
+        <div>
+          <h3>Postur &amp; Body Language</h3>
+          <p>Latihan harian buat benerin postur bahu &amp; tulang belakang, plus cara bawa diri yang bikin kelihatan lebih percaya diri.</p>
+          <div class="tags"><span>postur</span><span>stretching</span><span>body language</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num mono">04</div>
+        <div>
+          <h3>Gaya &amp; Fashion Dasar</h3>
+          <p>Basic wardrobe yang bikin proporsi badan lebih rapi tanpa harus belanja banyak — fokus ke fit &amp; warna yang cocok.</p>
+          <div class="tags"><span>fit</span><span>warna</span><span>capsule wardrobe</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num mono">05</div>
+        <div>
+          <h3>Mindset &amp; Kepercayaan Diri</h3>
+          <p>Kebiasaan harian kecil buat bangun rasa percaya diri yang kelihatan dari cara kamu ngomong dan gerak, bukan cuma dari tampilan.</p>
+          <div class="tags"><span>habit</span><span>mindset</span><span>self-talk</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="isi">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Yang Kamu Dapet</div>
+      <h2>Satu paket, <em>langsung kepake.</em></h2>
+    </div>
+    <div class="includes-grid">
+      <div class="include-item"><span class="mark mono">01</span><div><h4>E-book Sanzie Method (PDF)</h4><p>Panduan lengkap 5 pilar dengan langkah praktis harian.</p></div></div>
+      <div class="include-item"><span class="mark mono">02</span><div><h4>Checklist Harian &amp; Mingguan</h4><p>Biar kamu bisa tracking progress tanpa ribet.</p></div></div>
+      <div class="include-item"><span class="mark mono">03</span><div><h4>Kumpulan Referensi Video</h4><p>Playlist tutorial pendukung tiap pilar program.</p></div></div>
+      <div class="include-item"><span class="mark mono">04</span><div><h4>Akses Grup Komunitas</h4><p>Diskusi &amp; saling dukung sesama member Sanzie Method.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Kata Member</div>
+      <h2>Cerita dari yang <em>udah jalanin.</em></h2>
+    </div>
+    <div class="testi-strip">
+      <div class="testi">
+        <p class="quote">"Paling kerasa di bagian postur, ternyata itu yang paling gampang dilupain padahal efeknya gede."</p>
+        <div class="who">— B. RAMADHAN, MEMBER</div>
+      </div>
+      <div class="testi">
+        <p class="quote">"Suka karena urutannya jelas, jadi nggak bingung mulai dari mana."</p>
+        <div class="who">— R. ADITYA, MEMBER</div>
+      </div>
+      <div class="testi">
+        <p class="quote">"Harganya murah tapi isinya lengkap, worth banget buat pemula."</p>
+        <div class="who">— F. NUGROHO, MEMBER</div>
+      </div>
+    </div>
+    <p class="testi-note">*Testimoni contoh — ganti dengan testimoni asli dari pembelimu sebelum publish.</p>
+  </div>
+</section>
+
+<section id="harga">
+  <div class="wrap pricing-wrap">
+    <div class="price-card">
+      <div class="corner mono">ALL ACCESS</div>
+      <div class="toggle">
+        <button id="btn-idr" class="active">IDR</button>
+        <button id="btn-usd">USD</button>
+      </div>
+      <div class="big-price"><span id="currency-symbol">Rp</span> <span id="price-amount">50.000</span></div>
+      <div class="price-sub">Sekali bayar · bukan langganan</div>
+      <ul class="price-list">
+        <li>E-book Sanzie Method lengkap (5 pilar)</li>
+        <li>Checklist harian &amp; mingguan</li>
+        <li>Playlist video referensi</li>
+        <li>Akses grup komunitas</li>
+        <li>Update konten gratis selamanya</li>
+      </ul>
+      <a href="https://wa.me/6281222338324?text=Halo%2C%20saya%20mau%20beli%20Sanzie%20Method" target="_blank" rel="noopener" class="btn-primary" id="cta-buy">Gabung Sanzie Method</a>
+      <div class="guarantee">Pembayaran aman · konfirmasi manual via admin</div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap" style="max-width:760px;">
+    <div class="section-head">
+      <div class="kicker">Pertanyaan Umum</div>
+      <h2>Sebelum kamu <em>gabung.</em></h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q">Sanzie Method ini bentuknya apa? <span class="icon">+</span></button>
+        <div class="faq-a">Panduan digital (e-book PDF + checklist + video referensi) yang bisa diakses selamanya setelah pembelian.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Hasilnya instan nggak? <span class="icon">+</span></button>
+        <div class="faq-a">Nggak. Ini panduan kebiasaan jangka panjang, bukan solusi instan. Konsistensi yang menentukan hasil.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Cocok buat pemula yang belum pernah skincare-an? <span class="icon">+</span></button>
+        <div class="faq-a">Cocok. Materinya disusun dari dasar, jadi kamu nggak perlu pengalaman sebelumnya.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Gimana cara pembayaran &amp; dapetin aksesnya? <span class="icon">+</span></button>
+        <div class="faq-a">Klik tombol "Gabung Sanzie Method", kamu akan diarahkan ke WhatsApp admin (0812-2233-8324) untuk pembayaran, lalu akses dikirim setelah konfirmasi.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap">
+    <div class="kicker" style="text-align:center;justify-content:center;">Siap Mulai?</div>
+    <h2>Rp 50.000 hari ini, <em>versi terbaikmu besok.</em></h2>
+    <a href="https://wa.me/6281222338324?text=Halo%2C%20saya%20mau%20beli%20Sanzie%20Method" target="_blank" rel="noopener" class="btn-primary">Gabung Sanzie Method →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;width:100%;flex-wrap:wrap;gap:14px;">
+    <div class="fbrand">Sanzie Method</div>
+    <div class="disclaimer">Sanzie Method adalah konten edukasi self-improvement penampilan, bukan pengganti saran medis atau dermatologis profesional. Hasil tiap orang bisa berbeda.</div>
+  </div>
+</footer>
+
+<script>
+  // Price toggle
+  const btnIdr = document.getElementById('btn-idr');
+  const btnUsd = document.getElementById('btn-usd');
+  const symbol = document.getElementById('currency-symbol');
+  const amount = document.getElementById('price-amount');
+
+  btnIdr.addEventListener('click', () => {
+    btnIdr.classList.add('active');
+    btnUsd.classList.remove('active');
+    symbol.textContent = 'Rp';
+    amount.textContent = '50.000';
+  });
+  btnUsd.addEventListener('click', () => {
+    btnUsd.classList.add('active');
+    btnIdr.classList.remove('active');
+    symbol.textContent = '$';
+    amount.textContent = '3';
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if(!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>
