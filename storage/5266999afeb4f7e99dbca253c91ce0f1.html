@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SeiUpScaler - Liquid Glass Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --primary-light: #FFE3E3;
+            --bg: #E4E7EB;
+            --surface: rgba(255, 255, 255, 0.75);
+            --nav-bg: rgba(30, 30, 35, 0.85);
+            --text: #2D3748;
+            --text-secondary: #718096;
+            --border: rgba(255, 255, 255, 0.4);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --radius: 24px;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0F1117;
+            --surface: rgba(26, 32, 44, 0.75);
+            --nav-bg: rgba(18, 20, 26, 0.85);
+            --text: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            overflow: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 430px;
+            height: 100dvh;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        @media (min-width: 431px) {
+            .app-shell {
+                height: 880px;
+                border-radius: 40px;
+                border: 8px solid #1A202C;
+            }
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.35);
+        }
+
+        .logo-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text);
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.08);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Main Content Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .view-section {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Upload State */
+        .upload-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            background-color: var(--surface);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .upload-container:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .upload-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            color: var(--primary);
+        }
+
+        .upload-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .upload-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            transition: var(--transition);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        /* Editor Workspace */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background-color: #000;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .image-compare-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .image-compare-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        #img-upscaled-layer {
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+            z-index: 2;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: white;
+            z-index: 3;
+            cursor: ew-resize;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            color: #333;
+        }
+
+        .badge-tag {
+            position: absolute;
+            top: 14px;
+            padding: 4px 10px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border-radius: 20px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .badge-before { right: 14px; }
+        .badge-after { left: 14px; }
+
+        .hd-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #1a1a1a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 5;
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Toolbar / Bottom Sheet inside editor */
+        .toolbar {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .tools-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .tool-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .tool-item.active, .tool-item:hover {
+            color: var(--primary);
+        }
+
+        .tool-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .tool-item.active .tool-icon {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
+        }
+
+        .slider-controls {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            padding: 4px 0;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .slider-controls.active {
+            display: flex;
+        }
+
+        .slider-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background-color: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .btn-danger {
+            background-color: #E53E3E;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-danger:hover {
+            background-color: #C53030;
+        }
+
+        .btn-accent {
+            flex: 2;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Gallery View */
+        .gallery-header {
+            margin-bottom: 14px;
+        }
+
+        .gallery-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding-bottom: 20px;
+        }
+
+        .gallery-item {
+            aspect-ratio: 3/4;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: var(--surface);
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .empty-gallery {
+            grid-column: span 2;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Settings View */
+        .settings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .setting-card {
+            background-color: var(--surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .setting-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border);
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-switch { background-color: var(--primary); }
+        input:checked + .slider-switch:before { transform: translateX(22px); }
+
+        /* Liquid Glass Navigation Bar (Desain Mirip Referensi) */
+        .liquid-nav-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 390px;
+            height: 72px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 36px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            z-index: 100;
+        }
+
+        .liquid-nav-item {
+            position: relative;
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 100%;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            transition: var(--transition);
+        }
+
+        .liquid-nav-item svg {
+            width: 22px;
+            height: 22px;
+            transition: var(--transition);
+        }
+
+        .liquid-nav-item span {
+            font-size: 0.6rem;
+            margin-top: 3px;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .liquid-nav-item.active {
+            color: #FFFFFF;
+        }
+
+        .liquid-nav-item.active svg {
+            transform: translateY(-6px) scale(1.1);
+        }
+
+        .liquid-nav-item.active span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Floating Active Bubble Effect ala Liquid Navbar */
+        .liquid-nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            border-radius: 50%;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            z-index: -1;
+            transition: var(--transition);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            color: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 14px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .toast-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-60px);
+            background: rgba(30, 30, 35, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast-container.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        #file-input, #camera-input { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        <!-- Header -->
+        <header>
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <h1 class="logo-title">SeiUpScaler</h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="btn-theme" title="Toggle Theme" onclick="toggleTheme()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-content" style="padding-bottom: 90px;">
+            <!-- Upload / Home View -->
+            <section id="view-upload" class="view-section active">
+                <div class="upload-container" id="dropzone">
+                    <div class="upload-icon-wrapper">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <h3 class="upload-title">Enhance Photos with AI HD</h3>
+                    <p class="upload-subtitle">Tap to select photo from gallery or snap with camera</p>
+                    <button class="btn-primary" onclick="triggerFileInput()">Select from Device</button>
+                </div>
+            </section>
+
+            <!-- Editor View -->
+            <section id="view-editor" class="view-section">
+                <div class="workspace">
+                    <div class="image-compare-container" id="compare-container">
+                        <div class="hd-badge">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            AI HD
+                        </div>
+                        <span class="badge-tag badge-before">Before</span>
+                        <span class="badge-tag badge-after">After</span>
+                        
+                        <img id="img-original" src="" alt="Original Photo">
+                        <img id="img-upscaled-layer" src="" alt="Upscaled Photo">
+
+                        <div class="slider-handle" id="slider-handle">
+                            <div class="slider-button">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 15 12 9 6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div class="slider-controls" id="controls-sharpness">
+                        <div class="slider-label-row">
+                            <span>Sharpness</span>
+                            <span id="val-sharpness">80%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="80" oninput="updateAdjustment('sharpness', this.value)">
+                    </div>
+
+                    <div class="slider-controls" id="controls-smoothness">
+                        <div class="slider-label-row">
+                            <span>Smoothness</span>
+                            <span id="val-smoothness">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" oninput="updateAdjustment('smoothness', this.value)">
+                    </div>
+
+                    <div class="slider-controls" id="controls-light">
+                        <div class="slider-label-row">
+                            <span>Light Enhancement</span>
+                            <span id="val-light">65%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="65" oninput="updateAdjustment('light', this.value)">
+                    </div>
+
+                    <div class="tools-row" id="tools-row">
+                        <button class="tool-item" onclick="switchTool('sharpness')">
+                            <div class="tool-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            </div>
+                            Sharpness
+                        </button>
+                        <button class="tool-item" onclick="switchTool('smoothness')">
+                            <div class="tool-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                            </div>
+                            Smooth
+                        </button>
+                        <button class="tool-item" onclick="switchTool('light')">
+                            <div class="tool-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg>
+                            </div>
+                            Light
+                        </button>
+                        <button class="tool-item" onclick="toggleMagicHD()">
+                            <div class="tool-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            </div>
+                            Magic HD
+                        </button>
+                    </div>
+
+                    <div class="action-row">
+                        <button class="btn-secondary" onclick="resetEditor()">Reset</button>
+                        <button class="btn-accent" onclick="saveImage()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Save Photo
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gallery View -->
+            <section id="view-gallery" class="view-section">
+                <div class="gallery-header">
+                    <h2>Saved Upscaled Photos</h2>
+                </div>
+                <div class="gallery-grid" id="gallery-grid"></div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="view-settings" class="view-section">
+                <div class="gallery-header">
+                    <h2>Settings</h2>
+                </div>
+                <div class="settings-list">
+                    <div class="setting-card">
+                        <div class="setting-info">
+                            <h4>Dark Mode</h4>
+                            <p>Switch app liquid appearance</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-switch" onchange="toggleTheme()">
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+                    <div class="setting-card" onclick="showAPIKeyModal()" style="cursor: pointer;">
+                        <div class="setting-info">
+                            <h4>API Key Configuration</h4>
+                            <p>Update your Sylvatica API Key</p>
+                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></svg>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-info">
+                            <h4>API Provider</h4>
+                            <p>Sylva HD (Connected)</p>
+                        </div>
+                        <span style="color: #48BB78; font-size: 0.8rem; font-weight: 600;">Active</span>
+                    </div>
+                    <div class="setting-card" style="cursor: pointer;" onclick="clearGallery()">
+                        <div class="setting-info">
+                            <h4 style="color: #E53E3E;">Clear History Gallery</h4>
+                            <p>Remove all saved gallery records</p>
+                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E53E3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Liquid Glass Navigation Bar (4 Tombol Sesuai Permintaan) -->
+        <nav class="liquid-nav-container">
+            <button class="liquid-nav-item active" onclick="switchView('upload', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </button>
+            <button class="liquid-nav-item" onclick="triggerCameraInput()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>Camera</span>
+            </button>
+            <button class="liquid-nav-item" onclick="switchView('gallery', this); loadGallery();">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Gallery</span>
+            </button>
+            <button class="liquid-nav-item" onclick="switchView('settings', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loading-text">Enhancing Photo with AI...</div>
+        </div>
+
+        <div class="toast-container" id="toast"></div>
+        <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+        <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handleFileSelect(event)">
+    </div>
+
+    <script>
+        const state = {
+            originalImage: '',
+            upscaledImage: '',
+            activeTool: null,
+            adjustments: { sharpness: 80, smoothness: 50, light: 65 }
+        };
+
+        // API Configuration - Bisa diubah jika API Key sudah tidak valid
+        let API_KEY = localStorage.getItem('sei_api_key') || "sylva-UDIVa2GE";
+
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
+        function switchView(viewName, element) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+
+            if (element) {
+                document.querySelectorAll('.liquid-nav-item').forEach(btn => btn.classList.remove('active'));
+                element.classList.add('active');
+            }
+        }
+
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
+        }
+
+        function triggerCameraInput() {
+            document.getElementById('camera-input').click();
+        }
+
+        const dropzone = document.getElementById('dropzone');
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--primary)';
+                dropzone.style.backgroundColor = 'var(--primary-light)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--border)';
+                dropzone.style.backgroundColor = 'var(--surface)';
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) handleFiles(files[0]);
+        });
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length) handleFiles(files[0]);
+        }
+
+        async function handleFiles(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('Please upload a valid image file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state.originalImage = e.target.result;
+                document.getElementById('img-original').src = state.originalImage;
+                
+                // Switch tab editor otomatis dan sinkronkan tombol navigasi ke Home/Editor
+                switchView('editor', document.querySelector('.liquid-nav-item'));
+                processImageWithAPI(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadToTempHost(file) {
+            const formData = new FormData();
+            formData.append('files[]', file);
+
+            const response = await fetch('https://uguu.se/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (result && result.success && result.files && result.files.length > 0) {
+                return result.files[0].url;
+            }
+            throw new Error('Failed to upload image');
+        }
+
+        async function processImageWithAPI(file) {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loading-text');
+            loadingOverlay.classList.add('active');
+
+            try {
+                loadingText.textContent = 'Uploading to Cloud...';
+                const publicUrl = await uploadToTempHost(file);
+
+                loadingText.textContent = 'Enhancing Details with Sylva AI...';
+                const apiUrl = `https://sylvatica.my.id/api/tools/hd?url=${encodeURIComponent(publicUrl)}&apikey=${API_KEY}`;
+                
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                
+                const response = await fetch(apiUrl, { signal: controller.signal });
+                clearTimeout(timeout);
+                
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('API Key Invalid. Please update your key in settings.');
+                    }
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                let upscaledUrl = '';
+                if (data.url) upscaledUrl = data.url;
+                else if (data.result) upscaledUrl = data.result;
+                else if (data.data) upscaledUrl = data.data;
+                else if (data.imageUrl) upscaledUrl = data.imageUrl;
+                else if (data.success && data.output) upscaledUrl = data.output;
+                else if (typeof data === 'string') upscaledUrl = data;
+
+                if (!upscaledUrl) {
+                    throw new Error('No image URL in response');
+                }
+
+                // Verify URL is valid
+                if (!upscaledUrl.startsWith('http')) {
+                    throw new Error('Invalid image URL received');
+                }
+
+                state.upscaledImage = upscaledUrl;
+                document.getElementById('img-upscaled-layer').src = state.upscaledImage;
+                
+                loadingOverlay.classList.remove('active');
+                showToast('✨ Photo Enhanced Successfully!');
+                saveToGallery(state.upscaledImage);
+
+            } catch (error) {
+                console.error('API Error:', error);
+                loadingOverlay.classList.remove('active');
+                
+                // Better error messages
+                if (error.name === 'AbortError') {
+                    showToast('⏱️ Request timeout. Using original image.');
+                } else if (error.message.includes('API Key')) {
+                    showToast('🔑 ' + error.message);
+                } else if (error.message.includes('Failed to fetch')) {
+                    showToast('📡 Network error. Using original image.');
+                } else {
+                    showToast('⚠️ Enhancement failed. Using original image.');
+                }
+                
+                // Fallback to original
+                state.upscaledImage = state.originalImage;
+                document.getElementById('img-upscaled-layer').src = state.originalImage;
+            }
+        }
+
+        // Slider Handle Clip-Path Interaksi
+        const container = document.getElementById('compare-container');
+        const handle = document.getElementById('slider-handle');
+        const upscaledLayer = document.getElementById('img-upscaled-layer');
+
+        let isDragging = false;
+
+        function updateSliderPosition(clientX) {
+            const rect = container.getBoundingClientRect();
+            let x = clientX - rect.left;
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+
+            const percent = (x / rect.width) * 100;
+            handle.style.left = `${percent}%`;
+            upscaledLayer.style.clipPath = `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`;
+        }
+
+        handle.addEventListener('mousedown', () => isDragging = true);
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            updateSliderPosition(e.clientX);
+        });
+
+        handle.addEventListener('touchstart', () => isDragging = true);
+        window.addEventListener('touchend', () => isDragging = false);
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            updateSliderPosition(e.touches[0].clientX);
+        });
+
+        container.addEventListener('click', (e) => {
+            updateSliderPosition(e.clientX);
+        });
+
+        function switchTool(toolName) {
+            document.querySelectorAll('.slider-controls').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tool-item').forEach(el => el.classList.remove('active'));
+
+            if (state.activeTool === toolName) {
+                state.activeTool = null;
+                return;
+            }
+
+            state.activeTool = toolName;
+            const controlEl = document.getElementById(`controls-${toolName}`);
+            if (controlEl) controlEl.classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function updateAdjustment(type, value) {
+            state.adjustments[type] = value;
+            document.getElementById(`val-${type}`).textContent = `${value}%`;
+        }
+
+        function toggleMagicHD() {
+            showToast('Magic HD AI Engine Active');
+        }
+
+        function resetEditor() {
+            state.adjustments = { sharpness: 80, smoothness: 50, light: 65 };
+            showToast('Adjustments reset');
+        }
+
+        function saveToGallery(imgUrl) {
+            let gallery = JSON.parse(localStorage.getItem('sei_gallery') || '[]');
+            if (!gallery.includes(imgUrl)) {
+                gallery.unshift(imgUrl);
+                if (gallery.length > 20) gallery.pop();
+                localStorage.setItem('sei_gallery', JSON.stringify(gallery));
+            }
+        }
+
+        function loadGallery() {
+            const grid = document.getElementById('gallery-grid');
+            let gallery = JSON.parse(localStorage.getItem('sei_gallery') || '[]');
+
+            if (gallery.length === 0) {
+                grid.innerHTML = `<div class="empty-gallery">No upsaved photos yet.<br>Enhance photos to populate your gallery!</div>`;
+                return;
+            }
+
+            grid.innerHTML = gallery.map(url => `
+                <div class="gallery-item" onclick="viewGalleryItem('${url}')">
+                    <img src="${url}" alt="Upscaled Image">
+                </div>
+            `).join('');
+        }
+
+        function viewGalleryItem(url) {
+            state.originalImage = url;
+            state.upscaledImage = url;
+            document.getElementById('img-original').src = url;
+            document.getElementById('img-upscaled-layer').src = url;
+            switchView('editor', document.querySelectorAll('.liquid-nav-item')[0]);
+            showToast('Loaded photo from gallery');
+        }
+
+        function clearGallery() {
+            if (confirm('Clear all gallery records?')) {
+                localStorage.removeItem('sei_gallery');
+                loadGallery();
+                showToast('Gallery history cleared');
+            }
+        }
+
+        function saveImage() {
+            if (!state.upscaledImage) {
+                showToast('No image available to save');
+                return;
+            }
+
+            const a = document.createElement('a');
+            a.href = state.upscaledImage;
+            a.download = `SeiUpScaler_${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Photo downloaded successfully!');
+        }
+
+        function toggleTheme() {
+            const isDark = document.getElementById('theme-switch').checked;
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('sei_theme', isDark ? 'dark' : 'light');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('sei_theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-switch').checked = true;
+            }
+            loadGallery();
+        });
+
+        // API Key Management Functions
+        function showAPIKeyModal() {
+            const currentKey = localStorage.getItem('sei_api_key') || API_KEY;
+            const input = prompt('Enter your Sylvatica API Key:\n\n(Leave empty to use default key)', currentKey);
+            
+            if (input !== null) {
+                if (input.trim() === '') {
+                    resetAPIKey();
+                } else {
+                    saveAPIKey(input);
+                }
+            }
+        }
+
+        function saveAPIKey(key) {
+            const keyToSave = key || document.getElementById('api-key-input')?.value || '';
+            if (!keyToSave.trim()) {
+                showToast('Please enter a valid API Key');
+                return;
+            }
+            
+            localStorage.setItem('sei_api_key', keyToSave);
+            API_KEY = keyToSave;
+            showToast('✅ API Key updated successfully!');
+        }
+
+        function resetAPIKey() {
+            localStorage.removeItem('sei_api_key');
+            API_KEY = 'sylva-UDIVa2GE';
+            showToast('🔄 API Key reset to default');
+        }
+
+        function exportGallery() {
+            const gallery = JSON.parse(localStorage.getItem('sei_gallery') || '[]');
+            const dataStr = JSON.stringify(gallery, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `sei_gallery_${Date.now()}.json`;
+            link.click();
+            showToast('Gallery exported');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ This will clear ALL data including gallery history. Continue?')) {
+                localStorage.removeItem('sei_gallery');
+                localStorage.removeItem('sei_api_key');
+                localStorage.removeItem('sei_theme');
+                loadGallery();
+                showToast('All data cleared');
+            }
+        }
+    </script>
+</body>
+</html>
