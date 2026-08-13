@@ -1,0 +1,84 @@
+Debug Mode Active
+NGL AUTO SENDER
+// full debug edition — 3 mode pengiriman
+
+⚠ KENAPA GAK WORK?
+Browser punya 4 layer proteksi yang blokir request ke NGL:
+1. CORS Policy — NGL tidak kirim header Access-Control-Allow-Origin, jadi fetch dari domain/localhost/file:// diblokir browser
+2. Origin/Referer Validation — Browser auto-set Origin ke domain kamu (bukan ngl.link). Header ini forbidden, gak bisa di-override
+3. Cloudflare Bot Protection — Tanpa cookie cf_clearance, request di-challenge
+4. deviceId Format — Aslinya UUID v4 (36 char), bukan 42 hex random
+
+SOLUSI: Pakai mode CORS Proxy atau Bookmarklet (paling work)
+Direct
+(gak work di browser)
+CORS Proxy
+(work, via proxy)
+Bookmarklet
+(paling work 100%)
+Target Username
+kandi65428
+Message Payload
+Ajg
+Interval
+
+1.0s
+Test 1x
+Start
+Stop
+Sent
+0
+Failed
+0
+Rate Limited
+0
+Last Status
+—
+Last Request Debug Info
+Mode
+bookmarklet
+URL
+—
+deviceId
+—
+Origin (browser)
+https://www.biznetgio.com
+Status Code
+—
+Response
+—
+Error
+—
+// activity log
+11:36:54
+i
+Sistem siap. Pilih mode pengiriman:
+11:36:54
+•
+Direct = dari sini (biasanya kena CORS)
+11:36:54
+•
+CORS Proxy = lewat proxy (work, tapi agak lambat)
+11:36:54
+•
+Bookmarklet = paste di console NGL (100% work)
+11:37:02
+◆
+Mode diubah ke: BOOKMARKLET
+11:37:11
+i
+Mode Bookmarklet: copy kode di bawah, paste di Console halaman NGL target
+11:37:38
+i
+Mode Bookmarklet: copy kode di bawah, paste di Console halaman NGL target
+11:37:44
+i
+Mode Bookmarklet: copy kode di bawah, paste di Console halaman NGL target
+📋 Cara pakai Bookmarklet (100% work)
+Buka https://ngl.link/username_target di tab baru
+Tekan F12 untuk buka DevTools → tab Console
+Copy kode di bawah, paste ke Console, tekan Enter
+Atau drag link di bawah ke bookmark bar browser, lalu klik saat di halaman NGL
+// === NGL AUTO SENDER BOOKMARKLET === // Cara pakai: buka https://ngl.link/kandi65428, tekan F12, paste di Console, Enter (async function(){ const u = "kandi65428"; const m = "Ajg"; const delay = 1000; let count = 0, running = true; function devId(){ return (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{ const r = Math.random()*16|0; const v = c=='x'?r:(r&0x3|0x8); return v.toString(16); })); } async function send(){ if(!running) return; try{ const r = await fetch('https://ngl.link/api/submit', { method:'POST', headers:{ 'Accept':'*/*', 'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With':'XMLHttpRequest' }, body:'username='+encodeURIComponent(u)+'&question='+encodeURIComponent(m)+'&deviceId='+devId()+'&gameSlug=&referrer=' }); if(r.ok){ count++; console.log('%c✓ #'+count+' terkirim','color:#00ff9d;font-weight:bold'); } else if(r.status===429){ console.warn('Ratelimit, tunggu 5s'); await new Promise(x=>setTimeout(x,5000)); } else{ console.error('HTTP',r.status, await r.text()); await new Promise(x=>setTimeout(x,2000)); } }catch(e){ console.error(e); await new Promise(x=>setTimeout(x,2000)); } if(running) setTimeout(send, delay); } console.log('%c▶ NGL AUTO START for @'+u+' (interval '+delay+'ms)','color:#00d4ff;font-weight:bold;font-size:14px'); window._nglStop = ()=>{ running=false; console.log('■ Stopped. Total: '+count); }; send(); })();
+// Pilih mode yang sesuai kebutuhan
+// Direct mode = 99% diblokir CORS. Pakai Bookmarklet untuk hasil pasti masuk.
