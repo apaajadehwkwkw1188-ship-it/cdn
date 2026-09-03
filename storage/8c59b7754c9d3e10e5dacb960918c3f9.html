@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLORYHATTERS x SILENTX // Cyber Multi-Platform Extractor</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --accent: #ff0033;
+            --accent-glow: rgba(255, 0, 51, 0.6);
+            --tiktok-color: #00f2fe;
+            --ig-color: #e1306c;
+            --yt-color: #ff0000;
+            --bg: #030305;
+            --card-bg: rgba(8, 8, 12, 0.92);
+            --border: rgba(255, 255, 255, 0.15);
+            --text: #f0f0f5;
+            --text-dim: #777788;
+            --green-glow: #00ff66;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 40px 15px;
+        }
+
+        /* ============================================================
+           30 SECONDS CYBER PRELOADER OVERLAY
+        ============================================================ */
+        #cyberPreloader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #020204;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #cyberPreloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-disc-box {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .loader-outer-ring {
+            position: absolute;
+            inset: 0;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--accent);
+            border-bottom: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: loaderSpin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .loader-inner-ring {
+            position: absolute;
+            inset: 14px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-left: 2px solid var(--green-glow);
+            border-radius: 50%;
+            animation: loaderSpinReverse 2.5s linear infinite;
+        }
+
+        .loader-center-icon {
+            font-size: 2.2rem;
+            color: #fff;
+            text-shadow: 0 0 15px var(--accent-glow);
+            animation: pulseGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes loaderSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.08); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes loaderSpinReverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes pulseGlow {
+            from { opacity: 0.6; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1.1); }
+        }
+
+        .loader-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #fff;
+            text-shadow: 0 0 15px var(--accent-glow);
+            margin-bottom: 15px;
+        }
+
+        .loader-bar-wrapper {
+            width: 280px;
+            height: 7px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+        }
+
+        .loader-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--green-glow));
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: width 0.1s linear;
+        }
+
+        .loader-percent {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 800;
+            margin-top: 12px;
+        }
+
+        .loader-status-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--green-glow);
+            margin-top: 8px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* BACKGROUND CANVAS & GRID */
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* MAIN HUD CARD */
+        .hud-card {
+            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--accent-glow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* HUD CORNER BRACKETS */
+        .hud-corner {
+            position: absolute;
+            width: 16px; height: 16px;
+            border: 2px solid var(--accent);
+            pointer-events: none;
+        }
+        .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        /* VINYL DISC PLAYER */
+        .vinyl-container {
+            position: relative;
+            width: 190px;
+            height: 190px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .eq-ring {
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            border: 2px dashed var(--accent);
+            animation: rotateEq 20s linear infinite;
+            box-shadow: 0 0 15px var(--accent-glow);
+            opacity: 0.8;
+        }
+
+        @keyframes rotateEq {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .vinyl-disc {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background-image: url('11102.jpg');
+            background-size: cover;
+            background-position: center;
+            border: 5px solid #111;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.95), 0 0 20px var(--accent-glow);
+            animation: spinVinyl 16s linear infinite;
+            position: relative;
+            transition: background-image 0.5s ease;
+        }
+
+        .vinyl-disc::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 22px; height: 22px;
+            background: #050508;
+            border: 3px solid #444;
+            border-radius: 50%;
+        }
+
+        @keyframes spinVinyl {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-switch-art {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .btn-switch-art:hover {
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .title-glitch {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #fff;
+            text-shadow: 0 0 15px var(--accent-glow);
+            margin-bottom: 6px;
+        }
+
+        .quote {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+            max-width: 90%;
+            margin: 0 auto 20px;
+            padding: 6px 14px;
+            background: rgba(255, 0, 51, 0.03);
+            border-left: 2px solid var(--accent);
+            border-right: 2px solid var(--accent);
+        }
+
+        /* INPUT FORM */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .cyber-input {
+            width: 100%;
+            padding: 16px 110px 16px 45px;
+            background: rgba(5, 5, 8, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .btn-paste {
+            position: absolute;
+            right: 8px; top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-paste:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, #660012 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 25px var(--accent-glow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px var(--accent-glow);
+        }
+
+        /* TERMINAL LOG */
+        .terminal-box {
+            display: none;
+            margin-top: 15px;
+            background: #020204;
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--green-glow);
+            text-align: left;
+        }
+
+        /* DYNAMIC MEDIA RESULT PANEL */
+        .media-result-card {
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .thumb-preview {
+            width: 110px;
+            height: 110px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .meta-details { flex: 1; }
+
+        .badge-status {
+            display: inline-block;
+            background: rgba(0, 255, 102, 0.15);
+            color: var(--green-glow);
+            border: 1px solid var(--green-glow);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+
+        .video-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .video-meta-sub {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.88rem;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .dl-grid-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+        }
+
+        .dl-card-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dl-card-option .opt-info { display: flex; flex-direction: column; }
+
+        .dl-card-option .res-tag {
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dl-card-option .res-desc {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            margin-top: 3px;
+        }
+
+        .dl-card-option i {
+            font-size: 1.2rem;
+            color: var(--accent);
+            transition: 0.3s;
+        }
+
+        .dl-card-option:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 18px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .dl-card-option:hover .res-desc,
+        .dl-card-option:hover i { color: #fff; }
+
+        .option-best {
+            border-color: var(--accent);
+            background: rgba(255, 0, 51, 0.08);
+        }
+
+        /* SECTION LABEL FOR STANDALONE MODULES */
+        .module-section-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            color: #fff;
+            text-transform: uppercase;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .module-section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        /* 3 MODUL SEPARATED MENU CARDS */
+        .platform-card {
+            text-align: left;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .platform-card.highlight {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+            transform: scale(1.02);
+        }
+
+        .platform-title-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .platform-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-tiktok .platform-title { color: var(--tiktok-color); }
+        .card-tiktok .hud-corner { border-color: var(--tiktok-color); }
+        
+        .card-instagram .platform-title { color: var(--ig-color); }
+        .card-instagram .hud-corner { border-color: var(--ig-color); }
+
+        .card-youtube .platform-title { color: var(--yt-color); }
+        .card-youtube .hud-corner { border-color: var(--yt-color); }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+        }
+
+        .dl-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dl-item .info { display: flex; flex-direction: column; }
+        .dl-item .main { font-weight: 700; font-size: 0.88rem; }
+        .dl-item .sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+        .dl-item i { font-size: 1.1rem; color: var(--accent); }
+
+        .dl-item:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .dl-item:hover .sub, .dl-item:hover i { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- 30 SECONDS CYBER PRELOADER OVERLAY -->
+    <div id="cyberPreloader">
+        <div class="loader-disc-box">
+            <div class="loader-outer-ring"></div>
+            <div class="loader-inner-ring"></div>
+            <i class="fa-solid fa-bolt loader-center-icon"></i>
+        </div>
+        <div class="loader-title">CYBER-HUD SYSTEM v8.0</div>
+        <div class="loader-bar-wrapper">
+            <div class="loader-bar-fill" id="loaderFill"></div>
+        </div>
+        <div class="loader-percent" id="loaderPercent">0%</div>
+        <div class="loader-status-text" id="loaderStatus">> INITIALIZING SYSTEM CORE...</div>
+    </div>
+
+    <!-- BACKGROUND CANVAS & GRID -->
+    <canvas id="bgCanvas"></canvas>
+    <div class="cyber-grid"></div>
+
+    <div class="container">
+        
+        <!-- HEADER & INPUT HUD CARD -->
+        <div class="hud-card">
+            <div class="hud-corner corner-tl"></div>
+            <div class="hud-corner corner-tr"></div>
+            <div class="hud-corner corner-bl"></div>
+            <div class="hud-corner corner-br"></div>
+
+            <!-- VINYL DISC PLAYER -->
+            <div class="vinyl-container">
+                <div class="eq-ring"></div>
+                <div class="vinyl-disc" id="vinylDisc"></div>
+            </div>
+
+            <button class="btn-switch-art" id="btnSwitchArt">
+                <i class="fa-solid fa-rotate"></i> SWITCH COVER ART (SILENTX / GLORYHATTERS)
+            </button>
+
+            <h1 class="title-glitch" id="mainTitle">SILENTX</h1>
+            <p class="quote">
+                "Aprendemos que a paz não se resume a palavras, mas a ações. E combater o mal não é uma opção, mas uma obrigação para qualquer um que se rebele."
+            </p>
+
+            <!-- FORM INPUT LINK -->
+            <form id="downloadForm">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-link input-icon" id="inputIcon"></i>
+                    <input type="text" id="videoUrl" class="cyber-input" placeholder="Tempelkan link TikTok, Instagram, atau YouTube di sini..." required autocomplete="off">
+                    <button type="button" class="btn-paste" id="btnPaste"><i class="fa-regular fa-clipboard"></i> PASTE</button>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-bolt"></i> PROCESS MEDIA LINK
+                </button>
+            </form>
+
+            <!-- TERMINAL LOG -->
+            <div class="terminal-box" id="terminalBox"></div>
+        </div>
+
+        <!-- DYNAMIC MEDIA RESULT PANEL (HASIL DITEMUKAN) -->
+        <div class="hud-card media-result-card" id="mediaResultCard">
+            <div class="hud-corner corner-tl"></div>
+            <div class="hud-corner corner-tr"></div>
+            <div class="hud-corner corner-bl"></div>
+            <div class="hud-corner corner-br"></div>
+
+            <div class="result-header">
+                <img src="11102.jpg" alt="Preview Media" class="thumb-preview" id="resThumb">
+                <div class="meta-details">
+                    <span class="badge-status" id="resPlatformTag"><i class="fa-solid fa-check"></i> MEDIA STREAM READY</span>
+                    <div class="video-title" id="resTitle">Judul Video Ditemukan</div>
+                    <div class="video-meta-sub">
+                        <span id="resAuthor"><i class="fa-solid fa-user"></i> @creator</span>
+                        <span id="resDuration"><i class="fa-regular fa-clock"></i> 02:45</span>
+                        <span id="resQuality"><i class="fa-solid fa-film"></i> Up to 1080p HD</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESOLUSI VIDEO -->
+            <div class="section-title">
+                <i class="fa-solid fa-display"></i> PILIH RESOLUSI VIDEO (MP4)
+            </div>
+            <div class="dl-grid-matrix">
+                <a href="#" class="dl-card-option option-best" id="opt1080" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-circle-play"></i> 1080p Full HD</span>
+                        <span class="res-desc">Bitrate Tinggi • ~45.2 MB</span>
+                    </div>
+                    <i class="fa-solid fa-download"></i>
+                </a>
+                <a href="#" class="dl-card-option" id="opt720" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-play"></i> 720p HD</span>
+                        <span class="res-desc">Kualitas Standar • ~22.8 MB</span>
+                    </div>
+                    <i class="fa-solid fa-download"></i>
+                </a>
+                <a href="#" class="dl-card-option" id="opt480" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-mobile-screen"></i> 480p / 360p SD</span>
+                        <span class="res-desc">Hemat Kuota • ~11.4 MB</span>
+                    </div>
+                    <i class="fa-solid fa-download"></i>
+                </a>
+                <a href="#" class="dl-card-option" id="optNoWm" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-ban"></i> No Watermark</span>
+                        <span class="res-desc">Tanpa Watermark / Logo</span>
+                    </div>
+                    <i class="fa-solid fa-download"></i>
+                </a>
+            </div>
+
+            <!-- AUDIO / LAGU DOANG -->
+            <div class="section-title">
+                <i class="fa-solid fa-music"></i> DOWNLOAD LAGU / AUDIO SAJA
+            </div>
+            <div class="dl-grid-matrix">
+                <a href="#" class="dl-card-option option-best" id="optMp3Hq" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-file-audio"></i> Audio High Quality (MP3)</span>
+                        <span class="res-desc">320kbps Audio Track • ~4.8 MB</span>
+                    </div>
+                    <i class="fa-solid fa-music"></i>
+                </a>
+                <a href="#" class="dl-card-option" id="optSoundTrack" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-headphones"></i> Sound Original / Instrument</span>
+                        <span class="res-desc">Format Voice / Sound Raw</span>
+                    </div>
+                    <i class="fa-solid fa-headphones"></i>
+                </a>
+            </div>
+
+            <!-- THUMBNAIL COVER -->
+            <div class="section-title">
+                <i class="fa-solid fa-images"></i> ELEMEN TAMBAHAN
+            </div>
+            <div class="dl-grid-matrix">
+                <a href="#" class="dl-card-option" id="optCover" target="_blank">
+                    <div class="opt-info">
+                        <span class="res-tag"><i class="fa-solid fa-image"></i> Download Thumbnail HD</span>
+                        <span class="res-desc">Format Gambar JPG High-Res</span>
+                    </div>
+                    <i class="fa-solid fa-file-image"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="module-section-header">
+            <i class="fa-solid fa-cubes"></i> STANDALONE PLATFORM MODULES
+        </div>
+
+        <!-- 1. MODUL DOWNLOAD TIKTOK -->
+        <div class="hud-card platform-card card-tiktok" id="cardTiktok">
+            <div class="hud-corner corner-tl"></div>
+            <div class="hud-corner corner-tr"></div>
+            <div class="hud-corner corner-bl"></div>
+            <div class="hud-corner corner-br"></div>
+
+            <div class="platform-title-bar">
+                <div class="platform-title">
+                    <i class="fa-brands fa-tiktok"></i> TIKTOK MEDIA EXTRACTION
+                </div>
+                <span style="font-size: 0.75rem; color: var(--text-dim); font-family: 'Share Tech Mono';">MODULE // 01</span>
+            </div>
+
+            <div class="download-grid">
+                <a href="#" class="dl-item" id="ttNoWm" target="_blank">
+                    <div class="info">
+                        <span class="main">Video No Watermark</span>
+                        <span class="sub">Format MP4 Ultra HD</span>
+                    </div>
+                    <i class="fa-solid fa-circle-down"></i>
+                </a>
+                <a href="#" class="dl-item" id="ttWm" target="_blank">
+                    <div class="info">
+                        <span class="main">Video With Watermark</span>
+                        <span class="sub">Versi Original TikTok</span>
+                    </div>
+                    <i class="fa-solid fa-video"></i>
+                </a>
+                <a href="#" class="dl-item" id="ttAudio" target="_blank">
+                    <div class="info">
+                        <span class="main">Audio Track (MP3)</span>
+                        <span class="sub">Ekstraksi Sound 320kbps</span>
+                    </div>
+                    <i class="fa-solid fa-music"></i>
+                </a>
+                <a href="#" class="dl-item" id="ttCover" target="_blank">
+                    <div class="info">
+                        <span class="main">Cover Image HD</span>
+                        <span class="sub">Gambar Sampul Video</span>
+                    </div>
+                    <i class="fa-solid fa-image"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. MODUL DOWNLOAD INSTAGRAM -->
+        <div class="hud-card platform-card card-instagram" id="cardInstagram">
+            <div class="hud-corner corner-tl"></div>
+            <div class="hud-corner corner-tr"></div>
+            <div class="hud-corner corner-bl"></div>
+            <div class="hud-corner corner-br"></div>
+
+            <div class="platform-title-bar">
+                <div class="platform-title">
+                    <i class="fa-brands fa-instagram"></i> INSTAGRAM MEDIA EXTRACTION
+                </div>
+                <span style="font-size: 0.75rem; color: var(--text-dim); font-family: 'Share Tech Mono';">MODULE // 02</span>
+            </div>
+
+            <div class="download-grid">
+                <a href="#" class="dl-item" id="igReel" target="_blank">
+                    <div class="info">
+                        <span class="main">Reel / Video Post</span>
+                        <span class="sub">Format Kualitas HD MP4</span>
+                    </div>
+                    <i class="fa-solid fa-film"></i>
+                </a>
+                <a href="#" class="dl-item" id="igPhoto" target="_blank">
+                    <div class="info">
+                        <span class="main">Photo / Carousel</span>
+                        <span class="sub">Format Gambar JPG HD</span>
+                    </div>
+                    <i class="fa-solid fa-image"></i>
+                </a>
+                <a href="#" class="dl-item" id="igAudio" target="_blank">
+                    <div class="info">
+                        <span class="main">Original Sound MP3</span>
+                        <span class="sub">Audio Reel Instagram</span>
+                    </div>
+                    <i class="fa-solid fa-headphones"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. MODUL DOWNLOAD YOUTUBE -->
+        <div class="hud-card platform-card card-youtube" id="cardYoutube">
+            <div class="hud-corner corner-tl"></div>
+            <div class="hud-corner corner-tr"></div>
+            <div class="hud-corner corner-bl"></div>
+            <div class="hud-corner corner-br"></div>
+
+            <div class="platform-title-bar">
+                <div class="platform-title">
+                    <i class="fa-brands fa-youtube"></i> YOUTUBE MEDIA EXTRACTION
+                </div>
+                <span style="font-size: 0.75rem; color: var(--text-dim); font-family: 'Share Tech Mono';">MODULE // 03</span>
+            </div>
+
+            <div class="download-grid">
+                <a href="#" class="dl-item" id="yt1080" target="_blank">
+                    <div class="info">
+                        <span class="main">Video 1080p Full HD</span>
+                        <span class="sub">High Bitrate Video MP4</span>
+                    </div>
+                    <i class="fa-solid fa-desktop"></i>
+                </a>
+                <a href="#" class="dl-item" id="yt720" target="_blank">
+                    <div class="info">
+                        <span class="main">Video 720p HD</span>
+                        <span class="sub">Standard Quality MP4</span>
+                    </div>
+                    <i class="fa-solid fa-mobile-screen"></i>
+                </a>
+                <a href="#" class="dl-item" id="ytAudio" target="_blank">
+                    <div class="info">
+                        <span class="main">Audio MP3 HQ</span>
+                        <span class="sub">Ekstraksi Musik 320kbps</span>
+                    </div>
+                    <i class="fa-solid fa-music"></i>
+                </a>
+                <a href="#" class="dl-item" id="ytThumb" target="_blank">
+                    <div class="info">
+                        <span class="main">Thumbnail HD</span>
+                        <span class="sub">Max Resolution Image</span>
+                    </div>
+                    <i class="fa-solid fa-file-image"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // 0. 30 SECONDS CYBER PRELOADER LOGIC
+        // ============================================================
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('cyberPreloader');
+            const fill = document.getElementById('loaderFill');
+            const percent = document.getElementById('loaderPercent');
+            const status = document.getElementById('loaderStatus');
+
+            // Logs bertahap selama 30 detik
+            const statusMsgs = [
+                "> INITIALIZING CYBERNETIC CORE...",
+                "> CONNECTING TO NEURAL DATA NODES...",
+                "> LOADING PLATFORM DECRYPTION ENGINES...",
+                "> BYPASSING SECURITY PROTOCOLS...",
+                "> SYNCHRONIZING MULTI-STREAM BUFFERS...",
+                "> CALIBRATING HIGH-SPEED DOWNLOAD PIPELINES...",
+                "> FINALIZING INTERFACE HUD RENDER...",
+                "> ACCESS GRANTED // SYSTEM READY!"
+            ];
+
+            let progress = 0;
+            const totalTimeMs = 30000; // 30 Detik
+            const intervalMs = 300; // Update setiap 300ms
+            const stepIncrement = 100 / (totalTimeMs / intervalMs);
+
+            const timer = setInterval(() => {
+                progress += stepIncrement;
+                
+                if (progress >= 12 && progress < 25) status.textContent = statusMsgs[1];
+                else if (progress >= 25 && progress < 40) status.textContent = statusMsgs[2];
+                else if (progress >= 40 && progress < 55) status.textContent = statusMsgs[3];
+                else if (progress >= 55 && progress < 70) status.textContent = statusMsgs[4];
+                else if (progress >= 70 && progress < 85) status.textContent = statusMsgs[5];
+                else if (progress >= 85 && progress < 99) status.textContent = statusMsgs[6];
+
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(timer);
+                    status.textContent = statusMsgs[7];
+
+                    setTimeout(() => {
+                        preloader.classList.add('fade-out');
+                    }, 500);
+                }
+
+                const currentVal = Math.floor(progress);
+                fill.style.width = currentVal + '%';
+                percent.textContent = currentVal + '%';
+            }, intervalMs);
+        });
+
+        // ============================================================
+        // 1. TOGGLE COVER ART
+        // ============================================================
+        let currentCover = '11102.jpg';
+        const vinylDisc = document.getElementById('vinylDisc');
+        const btnSwitchArt = document.getElementById('btnSwitchArt');
+        const mainTitle = document.getElementById('mainTitle');
+
+        btnSwitchArt.addEventListener('click', () => {
+            if (currentCover === '11102.jpg') {
+                currentCover = '11025.jpg';
+                vinylDisc.style.backgroundImage = "url('11025.jpg')";
+                mainTitle.textContent = "GLORYHATTERS";
+            } else {
+                currentCover = '11102.jpg';
+                vinylDisc.style.backgroundImage = "url('11102.jpg')";
+                mainTitle.textContent = "SILENTX";
+            }
+        });
+
+        // ============================================================
+        // 2. BACKGROUND PARTICLES
+        // ============================================================
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 10;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.7 + 0.3;
+            }
+            update() {
+                this.y -= this.speedY;
+                this.opacity -= 0.002;
+                if (this.y < 0 || this.opacity <= 0) this.reset();
+            }
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#ff0033';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for (let i = 0; i < 40; i++) particles.push(new Particle());
+
+        function animParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animParticles);
+        }
+        animParticles();
+
+        // ============================================================
+        // 3. INPUT AUTO ICON DETECTOR, PASTE, & MODULE HIGHLIGHT
+        // ============================================================
+        const videoInput = document.getElementById('videoUrl');
+        const inputIcon = document.getElementById('inputIcon');
+        const cardTiktok = document.getElementById('cardTiktok');
+        const cardInstagram = document.getElementById('cardInstagram');
+        const cardYoutube = document.getElementById('cardYoutube');
+
+        videoInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            [cardTiktok, cardInstagram, cardYoutube].forEach(c => c.classList.remove('highlight'));
+
+            if (val.includes('tiktok.com')) {
+                inputIcon.className = 'fa-brands fa-tiktok input-icon';
+                cardTiktok.classList.add('highlight');
+            } else if (val.includes('instagram.com')) {
+                inputIcon.className = 'fa-brands fa-instagram input-icon';
+                cardInstagram.classList.add('highlight');
+            } else if (val.includes('youtube.com') || val.includes('youtu.be')) {
+                inputIcon.className = 'fa-brands fa-youtube input-icon';
+                cardYoutube.classList.add('highlight');
+            } else {
+                inputIcon.className = 'fa-solid fa-link input-icon';
+            }
+        });
+
+        document.getElementById('btnPaste').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                videoInput.value = text;
+                videoInput.dispatchEvent(new Event('input'));
+            } catch (e) {
+                alert('Gagal mengakses clipboard.');
+            }
+        });
+
+        // ============================================================
+        // 4. PROCESS LINK & SHOW ALL DOWNLOAD MENUS
+        // ============================================================
+        const form = document.getElementById('downloadForm');
+        const terminal = document.getElementById('terminalBox');
+        const mediaResultCard = document.getElementById('mediaResultCard');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = videoInput.value.trim();
+            if(!url) return;
+
+            mediaResultCard.style.display = 'none';
+            terminal.style.display = 'block';
+            terminal.innerHTML = '';
+
+            const logs = [
+                "> ANALYZING TARGET URL PROTOCOL...",
+                "> FETCHING METADATA & STREAM CHUNKS...",
+                "> RESOLVING MULTI-QUALITY BITRATES (1080p, 720p, 480p)...",
+                "> EXTRACTING MP3 AUDIO TRACK...",
+                "> UPDATING ALL STANDALONE MODULES...",
+                "> MEDIA STREAM SUCCESSFULLY RESOLVED!"
+            ];
+
+            for (let i = 0; i < logs.length; i++) {
+                await new Promise(r => setTimeout(r, 200));
+                const line = document.createElement('div');
+                line.textContent = logs[i];
+                terminal.appendChild(line);
+            }
+
+            setTimeout(() => {
+                terminal.style.display = 'none';
+
+                let platform = "MEDIA STREAM";
+                if(url.includes('tiktok.com')) platform = "TIKTOK VIRAL STREAM";
+                else if(url.includes('instagram.com')) platform = "INSTAGRAM REEL / POST";
+                else if(url.includes('youtube.com') || url.includes('youtu.be')) platform = "YOUTUBE HD VIDEO";
+
+                // Update Result Card
+                document.getElementById('resTitle').textContent = `${platform} - Extracted Content`;
+                document.getElementById('resAuthor').innerHTML = `<i class="fa-solid fa-user"></i> @creator_vault`;
+                document.getElementById('resThumb').src = currentCover;
+
+                document.getElementById('opt1080').href = url;
+                document.getElementById('opt720').href = url;
+                document.getElementById('opt480').href = url;
+                document.getElementById('optNoWm').href = url;
+                
+                document.getElementById('optMp3Hq').href = url;
+                document.getElementById('optSoundTrack').href = url;
+                document.getElementById('optCover').href = currentCover;
+
+                // Update Separated Modules Links
+                document.getElementById('ttNoWm').href = url;
+                document.getElementById('ttWm').href = url;
+                document.getElementById('ttAudio').href = url;
+                document.getElementById('ttCover').href = currentCover;
+
+                document.getElementById('igReel').href = url;
+                document.getElementById('igPhoto').href = currentCover;
+                document.getElementById('igAudio').href = url;
+
+                document.getElementById('yt1080').href = url;
+                document.getElementById('yt720').href = url;
+                document.getElementById('ytAudio').href = url;
+                document.getElementById('ytThumb').href = currentCover;
+
+                mediaResultCard.style.display = 'block';
+                mediaResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 300);
+        });
+    </script>
+</body>
+</html>
