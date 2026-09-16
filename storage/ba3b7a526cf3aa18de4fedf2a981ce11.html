@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⬇️ TikTok Downloader • Full Stats</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0b0e14;
+            color: #c8d0dc;
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .app {
+            max-width: 500px;
+            width: 100%;
+            background: #131a24;
+            border-radius: 28px;
+            padding: 24px 20px 30px;
+            border: 1px solid #2a3440;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+        }
+        .app h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00e676;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .app .sub {
+            color: #5a6f82;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .input-group input {
+            padding: 14px 18px;
+            border-radius: 40px;
+            border: 1px solid #1f2a36;
+            background: #0a1018;
+            color: #e8edf5;
+            font-size: 15px;
+            outline: none;
+        }
+        .input-group input:focus { border-color: #00e676; }
+        .input-group input::placeholder { color: #3a4a5e; }
+        .input-group button {
+            padding: 14px;
+            border: none;
+            border-radius: 40px;
+            background: #00e676;
+            color: #0b0e14;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .input-group button:hover { background: #00c853; transform: scale(1.02); }
+        .input-group button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        #result {
+            background: #0a1018;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #1f2a36;
+            min-height: 70px;
+            font-size: 14px;
+            color: #8a9bae;
+            margin-top: 12px;
+            word-break: break-word;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #result .info { color: #ffb74d; }
+        #result .error { color: #ff5252; }
+        #result .success { color: #00e676; }
+        #result .video-wrapper {
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+        #result .video-wrapper video {
+            width: 100%;
+            max-height: 400px;
+            display: block;
+        }
+        #result .meta {
+            width: 100%;
+            font-size: 13px;
+            color: #8a9bae;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        #result .meta strong { color: #e8edf5; }
+        .btn-download {
+            margin-top: 12px;
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            background: #00e676;
+            color: #0b0e14;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-download:hover { background: #00c853; transform: scale(1.02); }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 6px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .stats-grid .stat {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 6px 4px;
+            text-align: center;
+            border: 1px solid #1f2a36;
+        }
+        .stats-grid .stat .num {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e8edf5;
+        }
+        .stats-grid .stat .lbl {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #5a6f82;
+            letter-spacing: 0.3px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #3a4a5e;
+            border-top: 1px solid #141e2a;
+            padding-top: 14px;
+        }
+        .footer span { color: #00e676; }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2632;
+            color: #e8edf5;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            border: 1px solid #00e676;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            z-index: 99;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show { opacity: 1; }
+        @media (max-width: 480px) {
+            .app { padding: 18px 14px 24px; }
+            .app h1 { font-size: 20px; }
+            .input-group input { font-size: 14px; padding: 12px 16px; }
+            .input-group button { font-size: 14px; padding: 12px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <h1>⬇️ TikTok Downloader</h1>
+    <div class="sub">TikWM API • Full Stats • No Watermark</div>
+
+    <div class="input-group">
+        <input type="text" id="urlInput" placeholder="https://vt.tiktok.com/xxxxx/" />
+        <button id="downloadBtn">📥 Download</button>
+    </div>
+
+    <div id="result">
+        <span class="info">⏳ Tempel link TikTok dan klik Download</span>
+    </div>
+
+    <div class="footer">
+        <span>⬡</span> TikWM API · 5.000 request/hari · Full Stats
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ─── ELEMEN ───
+    const urlInput = document.getElementById('urlInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resultDiv = document.getElementById('result');
+    const toast = document.getElementById('toast');
+
+    // ─── TOAST ───
+    function showToast(msg, duration = 2500) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // ─── VALIDASI URL ───
+    function isValidTikTokUrl(url) {
+        const patterns = [
+            /tiktok\.com\/@[\w.-]+\/video\/\d+/,
+            /tiktok\.com\/@[\w.-]+\/photo\/\d+/,
+            /vm\.tiktok\.com\/\w+/,
+            /vt\.tiktok\.com\/\w+/,
+            /m\.tiktok\.com\/v\/\w+/
+        ];
+        return patterns.some(p => p.test(url));
+    }
+
+    // ─── FORMAT ANGKA ───
+    function formatNumber(num) {
+        if (!num) return '0';
+        if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+        if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+        return num.toString();
+    }
+
+    // ─── DOWNLOAD ───
+    async function downloadVideo() {
+        const url = urlInput.value.trim();
+        if (!url) {
+            resultDiv.innerHTML = '<span class="error">❌ Masukkan link TikTok terlebih dahulu.</span>';
+            showToast('❌ Link kosong');
+            return;
+        }
+
+        if (!isValidTikTokUrl(url)) {
+            resultDiv.innerHTML = '<span class="error">❌ Link TikTok tidak valid.</span>';
+            showToast('❌ Link tidak valid');
+            return;
+        }
+
+        // ─── LOADING ───
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = '⏳ Memproses...';
+        resultDiv.innerHTML = '<span class="info">⏳ Menghubungi TikWM API...</span>';
+
+        try {
+            // ─── API TIKWM ───
+            const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            const response = await fetch(apiUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status} — Gagal mengambil data.`);
+            }
+
+            const data = await response.json();
+
+            // ─── CEK DATA ───
+            if (!data || !data.data || !data.data.play) {
+                throw new Error('Data video tidak ditemukan. Coba link lain.');
+            }
+
+            const v = data.data;
+            const videoUrl = v.play;
+            const author = v.author?.unique_id || 'Unknown';
+            const description = v.title || 'Tanpa deskripsi';
+            const duration = v.duration || 0;
+            const width = v.width || 0;
+            const height = v.height || 0;
+            const cover = v.cover || '';
+
+            // ─── STATISTIK ───
+            const likes = v.digg_count || 0;
+            const shares = v.share_count || 0;
+            const comments = v.comment_count || 0;
+            const views = v.play_count || 0;
+
+            // ─── TAMPILKAN HASIL ───
+            const mins = Math.floor(duration / 60);
+            const secs = Math.floor(duration % 60);
+            const durationText = duration > 0 ? `${mins}m ${secs}s` : 'Tidak diketahui';
+
+            resultDiv.innerHTML = `
+                <div class="success">✅ Video ditemukan! (via TikWM)</div>
+                <div class="video-wrapper">
+                    <video src="${videoUrl}" controls muted playsinline poster="${cover}"></video>
+                </div>
+                <div class="meta">
+                    <strong>👤 Author:</strong> @${author}<br>
+                    <strong>📝 Deskripsi:</strong> ${description.substring(0, 100)}${description.length > 100 ? '...' : ''}<br>
+                    <strong>⏱️ Durasi:</strong> ${durationText} &nbsp;|&nbsp; <strong>📐 Resolusi:</strong> ${width}x${height}
+                </div>
+                <div class="stats-grid">
+                    <div class="stat"><div class="num">❤️ ${formatNumber(likes)}</div><div class="lbl">Like</div></div>
+                    <div class="stat"><div class="num">💬 ${formatNumber(comments)}</div><div class="lbl">Komentar</div></div>
+                    <div class="stat"><div class="num">↗️ ${formatNumber(shares)}</div><div class="lbl">Share</div></div>
+                    <div class="stat"><div class="num">👁️ ${formatNumber(views)}</div><div class="lbl">Tayangan</div></div>
+                </div>
+                <a href="${videoUrl}" download class="btn-download" target="_blank">⬇️ Download Video</a>
+            `;
+
+            showToast(`✅ Video siap! (${formatNumber(likes)} likes)`);
+
+        } catch (err) {
+            console.error('Error:', err);
+            resultDiv.innerHTML = `
+                <span class="error">❌ ${err.message}</span>
+                <div style="font-size:11px;color:#5a6f82;margin-top:6px;">
+                    💡 Pastikan link benar dan video tidak private.
+                </div>
+            `;
+            showToast('❌ Gagal memproses video');
+        } finally {
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = '📥 Download';
+        }
+    }
+
+    // ─── EVENT ───
+    downloadBtn.addEventListener('click', downloadVideo);
+
+    urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            downloadVideo();
+        }
+    });
+
+    // ─── AUTOFOCUS ───
+    urlInput.focus();
+
+    console.log('⬇️ TikTok Downloader — TikWM API + Full Stats siap!');
+</script>
+</body>
+</html>
