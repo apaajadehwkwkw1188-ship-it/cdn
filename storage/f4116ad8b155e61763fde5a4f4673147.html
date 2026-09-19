@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BL_AI — Horror Lock Simulator</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020202;color:#eee;font-family:Arial,sans-serif}
+body{display:grid;place-items:center}
+#screen{position:fixed;inset:0;background:
+radial-gradient(circle at 50% 35%,#240000 0,#080000 35%,#000 75%);
+display:flex;align-items:center;justify-content:center;transition:.15s}
+.scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.025) 4px);mix-blend-mode:screen}
+.vignette{position:absolute;inset:0;box-shadow:inset 0 0 150px #000;pointer-events:none}
+.panel{width:min(92vw,620px);text-align:center;position:relative;z-index:2}
+.badge{font-size:12px;letter-spacing:5px;color:#f33;margin-bottom:15px}
+h1{font-size:clamp(44px,11vw,88px);margin:0;color:#f21b1b;text-shadow:0 0 12px #f00,0 0 45px #600;letter-spacing:8px}
+.warning{font-weight:700;letter-spacing:2px;margin:12px 0 24px}
+.face{width:180px;height:180px;margin:0 auto 24px;border-radius:50%;background:#080808;box-shadow:0 0 30px #900,0 0 90px #300;position:relative}
+.face:before,.face:after{content:"";position:absolute;top:58px;width:44px;height:28px;background:#eee;clip-path:polygon(0 50%,100% 0,75% 100%);filter:drop-shadow(0 0 7px red)}
+.face:before{left:34px;transform:rotate(8deg)}
+.face:after{right:34px;transform:scaleX(-1) rotate(8deg)}
+.mouth{position:absolute;left:50%;bottom:35px;transform:translateX(-50%);width:100px;height:42px;border:5px solid #eee;border-top:0;border-radius:0 0 55px 55px}
+.mouth i{display:block;height:7px;background:#900;margin-top:20px}
+input{width:min(90%,360px);padding:15px;border:1px solid #900;background:#080808;color:#fff;text-align:center;border-radius:8px;outline:0;font-size:18px}
+input:focus{border-color:#f22;box-shadow:0 0 18px #500}
+button{margin:10px 5px;padding:13px 20px;border:1px solid #b11;background:#150000;color:#fff;border-radius:8px;font-weight:700;cursor:pointer}
+button:hover{background:#350000}
+#status{min-height:25px;margin-top:8px;color:#f44;font-weight:700}
+#timer{font-size:13px;color:#777;margin-top:8px}
+#exit{position:fixed;right:12px;bottom:12px;z-index:9;opacity:.35;font-size:11px}
+#exit:hover{opacity:1}
+.shake{animation:shake .13s linear 5}
+.glitch{animation:glitch .18s steps(2) 3}
+@keyframes shake{25%{transform:translate(8px,-3px)}50%{transform:translate(-7px,4px)}75%{transform:translate(4px,2px)}}
+@keyframes glitch{0%{filter:hue-rotate(0)}50%{filter:hue-rotate(90deg) brightness(2)}100%{filter:hue-rotate(0)}}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8}
+</style>
+</head>
+<body>
+<div id="screen">
+  <div class="scan"></div><div class="vignette"></div>
+  <main class="panel">
+    <div class="badge">BL_AI // HORROR SIMULATOR v1.0</div>
+    <h1>LOCKED</h1>
+    <div class="face" aria-label="wajah seram"><div class="mouth"><i></i></div></div>
+    <div class="warning">ACCESS DENIED — ENTER DEMO PASSWORD</div>
+    <input id="pw" type="password" placeholder="Password demo" autocomplete="off">
+    <div>
+      <button id="unlock">UNLOCK</button>
+      <button id="sound">🔊 SOUND ON</button>
+    </div>
+    <div id="status">Password salah akan memicu efek horror.</div>
+    <div id="timer">SIMULATED LOCK • Browser/device tidak benar-benar dikunci</div>
+  </main>
+</div>
+<button id="exit">EXIT SIMULATION</button>
+<div class="flash" id="flash"></div>
+
+<script>
+"use strict";
+
+// Password demo: BL-AI-2026
+const DEMO_PASSWORD = "BL-AI-2026";
+const screen = document.getElementById("screen");
+const pw = document.getElementById("pw");
+const status = document.getElementById("status");
+const flash = document.getElementById("flash");
+const soundBtn = document.getElementById("sound");
+let soundOn = false;
+let audioCtx = null;
+
+function audioStart(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+}
+function tone(freq,dur,type="sawtooth",gain=.035,delay=0){
+  if(!soundOn) return;
+  audioStart();
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,audioCtx.currentTime+delay);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,freq*.45),audioCtx.currentTime+delay+dur);
+  g.gain.setValueAtTime(0,audioCtx.currentTime+delay);
+  g.gain.linearRampToValueAtTime(gain,audioCtx.currentTime+delay+.02);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+delay+dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(audioCtx.currentTime+delay); o.stop(audioCtx.currentTime+delay+dur+.03);
+}
+function horrorSound(){
+  tone(130,.55,"sawtooth",.06);
+  tone(70,.8,"square",.045,.08);
+  tone(440,.12,"sine",.03,.28);
+  tone(95,1.0,"sawtooth",.055,.42);
+}
+function scare(){
+  screen.classList.remove("shake","glitch"); void screen.offsetWidth;
+  screen.classList.add("shake","glitch");
+  flash.style.opacity=".85";
+  setTimeout(()=>flash.style.opacity="0",70);
+  horrorSound();
+}
+function unlock(){
+  const value=pw.value;
+  if(value===DEMO_PASSWORD){
+    status.style.color="#4f4";
+    status.textContent="ACCESS GRANTED — SIMULATION ENDED.";
+    document.querySelector("h1").textContent="UNLOCKED";
+    document.querySelector("h1").style.color="#4f4";
+    tone(660,.18,"sine",.04); tone(880,.22,"sine",.035,.18);
+    setTimeout(()=>alert("BL_AI: Simulasi selesai. Tidak ada file/perangkat yang dikunci."),150);
+  }else{
+    status.style.color="#f22";
+    status.textContent=value ? "WRONG PASSWORD — HORROR EVENT TRIGGERED!" : "NO PASSWORD — ACCESS DENIED!";
+    pw.value="";
+    scare();
+  }
+}
+document.getElementById("unlock").onclick=unlock;
+pw.addEventListener("keydown",e=>{if(e.key==="Enter")unlock()});
+soundBtn.onclick=()=>{
+  soundOn=!soundOn;
+  soundBtn.textContent=soundOn?"🔊 SOUND ON":"🔇 SOUND OFF";
+  if(soundOn){audioStart(); tone(180,.2,"sine",.03)}
+};
+document.getElementById("exit").onclick=()=>{
+  if(confirm("Keluar dari simulasi horror?")) document.body.innerHTML="<div style='display:grid;place-items:center;width:100vw;height:100vh;background:#050505;color:#aaa;font-family:Arial'>SIMULASI SELESAI</div>";
+};
+
+// Tidak ada API yang dapat memblokir tombol Back/menutup browser secara permanen.
+// Escape tetap dapat digunakan untuk keluar dari fullscreen jika browser mengizinkannya.
+document.addEventListener("contextmenu",e=>e.preventDefault());
+</script>
+</body>
+</html>
