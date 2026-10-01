@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student System - M. Alvin Pradipta</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New', Courier, monospace, Arial, sans-serif}
+body{min-height:100vh;padding:20px;color:#000;background:#FFF4E0;background-image:radial-gradient(#000 1px,transparent 1px);background-size:24px 24px}
+.container{max-width:850px;margin:auto}
+
+/* Neobrutalism Core Components */
+.header,.card{
+  background:#fff;
+  border:4px solid #000;
+  border-radius:16px;
+  box-shadow:6px 6px 0px #000;
+  margin-bottom:24px;
+}
+
+.header{text-align:center;padding:25px 15px;background:#FFDE59}
+
+.system-name{
+  display:inline-block;
+  background:#000;
+  color:#FFDE59;
+  font-size:11px;
+  font-weight:900;
+  padding:4px 10px;
+  border-radius:6px;
+  letter-spacing:1px;
+  margin-bottom:10px;
+  text-transform:uppercase;
+}
+
+.header h1{font-size:28px;color:#000;font-weight:900;letter-spacing:-0.5px}
+.header p{color:#000;margin-top:6px;font-weight:700;font-size:14px}
+
+.time{
+  margin-top:15px;
+  padding:15px;
+  border-radius:12px;
+  background:#FF99C8;
+  border:3px solid #000;
+  box-shadow:3px 3px 0px #000;
+}
+.tanggal{color:#000;font-weight:900;font-size:15px}
+.jam{font-size:26px;font-weight:900;margin-top:4px;color:#000}
+.wib{color:#000;font-weight:900;font-size:12px;margin-top:2px}
+
+.card{padding:24px}
+.title{font-size:22px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+.warning-box{
+  background:#25D366;
+  border:3px solid #000;
+  box-shadow:4px 4px 0px #000;
+  color:#000;
+  padding:12px 15px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:900;
+  margin-bottom:20px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+label{display:block;color:#000;margin-bottom:8px;font-size:14px;font-weight:900;text-transform:uppercase}
+input[type=text],textarea{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:3px solid #000;
+  background:#FFF;
+  color:#000;
+  outline:none;
+  margin-bottom:18px;
+  font-weight:700;
+  box-shadow:3px 3px 0px #000;
+}
+input[type=text]:focus, textarea:focus{background:#E0F7FA}
+textarea{min-height:100px;resize:vertical}
+
+.status-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+.status input{display:none}
+.status label{
+  text-align:center;
+  padding:16px 8px;
+  border-radius:12px;
+  cursor:pointer;
+  background:#FFF;
+  border:3px solid #000;
+  font-weight:900;
+  box-shadow:4px 4px 0px #000;
+  transition:.1s;
+}
+.status input:checked+label{
+  transform:translate(2px, 2px);
+  box-shadow:2px 2px 0px #000;
+}
+.hadir input:checked+label{background:#00F5D4}
+.izin input:checked+label{background:#FFD166}
+.sakit input:checked+label{background:#FF9F1C}
+.alpa input:checked+label{background:#FF5964}
+
+/* Bagian Dinamis */
+.extra{display:none;animation:fade .20s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+.upload-box{padding:15px;border:3px dashed #000;border-radius:12px;margin-bottom:18px;background:#E8F1F5}
+.preview-container{margin-top:8px;display:none}
+.preview{width:100%;max-height:220px;object-fit:contain;border-radius:8px;border:2px solid #000;background:#000}
+.preview-text{font-size:11px;font-weight:700;margin-top:6px;color:#333}
+
+button{
+  width:100%;
+  border:3px solid #000;
+  padding:16px;
+  border-radius:12px;
+  background:#25D366;
+  color:#000;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:5px 5px 0px #000;
+  transition:.1s;
+}
+button:active{transform:translate(3px,3px);box-shadow:2px 2px 0px #000}
+
+.footer{text-align:center;color:#000;font-size:13px;font-weight:900;margin-top:20px}
+
+@media(max-width:600px){.header h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <div class="system-name">STUDENT SYSTEM • BY M.ALVIN PRADIPTA</div>
+  <h1>📋 ABSENSI SISWA</h1>
+  <p>Kirim laporan kehadiran langsung via WhatsApp</p>
+  <div class="time">
+    <div class="tanggal" id="tanggal">Memuat tanggal...</div>
+    <div class="jam" id="jam">00:00:00</div>
+    <div class="wib">WAKTU INDONESIA BARAT — WIB</div>
+  </div>
+</div>
+
+<div class="card">
+<div class="title">📝 Isi Absensi</div>
+
+<div class="warning-box">
+  <span>💬</span>
+  <span>Data dan link bukti sakit akan dikirim otomatis ke WhatsApp pengelola.</span>
+</div>
+
+<label>Nama Lengkap</label>
+<input type="text" id="nama" placeholder="Masukkan nama lengkap...">
+
+<label>Mata Pelajaran (Mapel)</label>
+<input type="text" id="mapel" placeholder="Contoh: Matematika, Bahasa Indonesia...">
+
+<label>Status Kehadiran</label>
+<div class="status-grid">
+<div class="status hadir"><input type="radio" name="status" id="hadir" value="Hadir" checked onchange="ubahStatus()"><label for="hadir">✅ HADIR</label></div>
+<div class="status izin"><input type="radio" name="status" id="izin" value="Izin" onchange="ubahStatus()"><label for="izin">📝 IZIN</label></div>
+<div class="status sakit"><input type="radio" name="status" id="sakit" value="Sakit" onchange="ubahStatus()"><label for="sakit">🤒 SAKIT</label></div>
+<div class="status alpa"><input type="radio" name="status" id="alpa" value="Alpa" onchange="ubahStatus()"><label for="alpa">❌ ALPA</label></div>
+</div>
+
+<!-- Kolom Penjelasan -->
+<div class="extra" id="bagianPenjelasan">
+  <label>📝 Penjelasan / Keterangan</label>
+  <textarea id="penjelasan" placeholder="Tuliskan alasan izin/sakit di sini..."></textarea>
+</div>
+
+<!-- Kolom Link Gambar Surat Dokter -->
+<div class="extra upload-box" id="bagianSuratDokter">
+  <label>🔗 Tempelkan link gambar surat izin dokter disini</label>
+  <input type="text" id="linkDrive" placeholder="Tempel link Google Drive di sini...">
+  
+  <div class="preview-container" id="previewContainer">
+    <label style="font-size:11px; margin-top:6px;">📷 Preview Gambar Google Drive:</label>
+    <img id="previewSurat" class="preview" alt="Preview Gagal Dimuat">
+    <div class="preview-text">Pastikan file Google Drive berstatus "Publik / Siapa saja dapat melihat".</div>
+  </div>
+</div>
+
+<button id="btnKirim" type="button" onclick="kirimWhatsApp()">🚀 KIRIM KE WHATSAPP</button>
+</div>
+
+<div class="footer">Student System • By M. Alvin Pradipta</div>
+</div>
+
+<script>
+    const nomorWA = "6288287427254";
+
+    function waktuWIB(){
+        try {
+            const n = new Date();
+            document.getElementById("tanggal").textContent = n.toLocaleDateString("id-ID",{timeZone:"Asia/Jakarta",weekday:"long",day:"numeric",month:"long",year:"numeric"});
+            document.getElementById("jam").textContent = n.toLocaleTimeString("id-ID",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})+" WIB";
+        } catch(e) {
+            console.error("Error waktu:", e);
+        }
+    }
+    waktuWIB();
+    setInterval(waktuWIB, 1000);
+
+    window.ubahStatus = function() {
+        const statusPilihan = document.querySelector('input[name="status"]:checked').value;
+        const bagianPenjelasan = document.getElementById("bagianPenjelasan");
+        const bagianSuratDokter = document.getElementById("bagianSuratDokter");
+        
+        if (statusPilihan === "Izin") {
+            bagianPenjelasan.style.display = "block";
+            bagianSuratDokter.style.display = "none";
+            document.getElementById("linkDrive").value = "";
+            document.getElementById("previewContainer").style.display = "none";
+        } else if (statusPilihan === "Sakit") {
+            bagianPenjelasan.style.display = "block";
+            bagianSuratDokter.style.display = "block";
+        } else {
+            bagianPenjelasan.style.display = "none";
+            bagianSuratDokter.style.display = "none";
+            document.getElementById("penjelasan").value = "";
+            document.getElementById("linkDrive").value = "";
+            document.getElementById("previewContainer").style.display = "none";
+        }
+    }
+
+    document.getElementById("linkDrive").addEventListener("input", function(){
+        let val = this.value.trim();
+        const container = document.getElementById("previewContainer");
+        const img = document.getElementById("previewSurat");
+
+        if(!val) {
+            container.style.display = "none";
+            return;
+        }
+
+        // Cek apakah link mengandung Google Drive
+        if (val.includes("drive.google.com")) {
+            let fileId = "";
+            if (val.includes("/d/")) {
+                let parts = val.split("/d/");
+                if (parts[1]) {
+                    fileId = parts[1].split("/")[0];
+                }
+            } else if (val.includes("id=")) {
+                let urlParams = new URLSearchParams(val.split("?")[1]);
+                fileId = urlParams.get("id");
+            }
+            
+            if (fileId) {
+                // Jika link Google Drive valid, tampilkan preview
+                img.src = `https://lh3.googleusercontent.com/d/` + fileId;
+                container.style.display = "block";
+                return;
+            }
+        }
+
+        // Jika BUKAN link Google Drive, sembunyikan preview sepenuhnya
+        container.style.display = "none";
+        img.src = "";
+    });
+
+    window.kirimWhatsApp = function() {
+        const nama = document.getElementById("nama").value.trim();
+        const mapel = document.getElementById("mapel").value.trim();
+        const status = document.querySelector('input[name="status"]:checked').value;
+        const penjelasan = document.getElementById("penjelasan").value.trim();
+        const linkDrive = document.getElementById("linkDrive").value.trim();
+
+        if(!nama) {
+            alert("⚠️ Nama lengkap harus diisi!");
+            return;
+        }
+        if(!mapel) {
+            alert("⚠️ Mata pelajaran harus diisi!");
+            return;
+        }
+        if((status === "Izin" || status === "Sakit") && !penjelasan) {
+            alert("⚠️ Silakan isi penjelasan untuk status " + status + "!");
+            return;
+        }
+
+        const n = new Date();
+        const tanggalStr = n.toLocaleDateString("id-ID",{timeZone:"Asia/Jakarta",day:"2-digit",month:"2-digit",year:"numeric"});
+        const waktuStr = n.toLocaleTimeString("id-ID",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}) + " WIB";
+
+        let pesan = `╔═════════════════════╗%0A`;
+        pesan += `     *VINZ*  *X* *ABSEN SYSTEM* %0A`;
+        pesan += `╚═════════════════════╝%0A%0A`;
+        pesan += `Nama: ${nama}%0A`;
+        pesan += `Ketentuan: ${status}%0A`;
+        pesan += `Mata Pelajaran: ${mapel}%0A`;
+        
+        if((status === "Izin" || status === "Sakit") && penjelasan) {
+            pesan += `Penjelasan: ${penjelasan}%0A`;
+        }
+
+        if(status === "Sakit" && linkDrive) {
+            pesan += `Link Surat Dokter: ${linkDrive}%0A`;
+        }
+
+        pesan += `Waktu: ${tanggalStr} - ${waktuStr}%0A`;
+
+        const urlWA = `https://wa.me/${nomorWA}?text=${pesan}`;
+        window.open(urlWA, '_blank');
+    }
+
+    ubahStatus();
+</script>
+</body>
+</html>
