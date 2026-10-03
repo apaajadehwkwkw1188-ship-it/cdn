@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DOXZXRAT — Login</title>
+<style>
+@font-face{font-family:'DoxzX';src:url('./DoxzX_Font.ttf') format('truetype');font-weight:400 700;font-display:swap}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;}
+body{
+  font-family:'DoxzX','Segoe UI',sans-serif;
+  background:#000;
+  color:#e5e7eb;
+  -webkit-font-smoothing:antialiased;
+  min-height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px 16px;
+}
+.wrap{
+  width:min(92vw,400px);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  animation:up .45s ease both;
+}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.hero{
+  width:100%;
+  border-radius:18px;
+  overflow:hidden;
+  border:1.5px solid #1a3a5c;
+  box-shadow:0 12px 32px rgba(0,0,0,.55);
+  background:#0a0a0a;
+}
+.hero img{
+  width:100%;
+  height:170px;
+  object-fit:cover;
+  object-position:center center;
+  display:block;
+}
+
+.card{
+  background:linear-gradient(160deg,#0d2137 0%,#0a1628 50%,#050d18 100%);
+  border:1.5px solid #1a3a5c;
+  border-radius:18px;
+  padding:20px 18px 18px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);
+}
+.card-title{
+  font-size:18px;font-weight:800;letter-spacing:1.5px;color:#fff;margin-bottom:4px;
+}
+.card-sub{
+  font-size:12px;color:#9ca3af;line-height:1.45;margin-bottom:16px;
+}
+
+.input-group{
+  position:relative;
+  margin-bottom:12px;
+}
+.input-group .ico{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:#60a5fa;pointer-events:none;
+}
+.input-group input{
+  width:100%;
+  height:48px;
+  padding:0 44px 0 44px;
+  border-radius:12px;
+  border:1.5px solid #1e3a5f;
+  background:#000;
+  color:#fff;
+  font-size:14px;
+  font-family:inherit;
+  outline:none;
+  transition:border .2s, box-shadow .2s;
+}
+.input-group input:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.input-group input::placeholder{color:#6b7280}
+.eye-btn{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:36px;height:36px;border:none;background:transparent;color:#9ca3af;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:8px;
+}
+.eye-btn:hover{color:#fff;background:rgba(255,255,255,.06)}
+
+.save-row{
+  display:flex;align-items:center;gap:10px;
+  margin:4px 0 16px;
+  cursor:pointer;
+  user-select:none;
+}
+.save-row input{display:none}
+.save-box{
+  width:20px;height:20px;border-radius:6px;
+  border:1.5px solid #1e3a5f;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.save-row.on .save-box{
+  background:#1e4a6e;border-color:#3b82f6;
+}
+.save-box svg{opacity:0;width:12px;height:12px;stroke:#fff}
+.save-row.on .save-box svg{opacity:1}
+.save-label{font-size:12px;color:#9ca3af;font-weight:600;letter-spacing:.5px}
+.save-row.on .save-label{color:#e5e7eb}
+
+.btn-login{
+  width:100%;height:50px;border-radius:12px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#1e4a6e,#0d2137);
+  border:1.5px solid #3b82f6;
+  color:#fff;font-size:14px;font-weight:800;letter-spacing:1.5px;
+  font-family:inherit;
+  box-shadow:0 6px 18px rgba(30,74,110,.35);
+  transition:transform .15s, box-shadow .15s, opacity .15s;
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(30,74,110,.45)}
+.btn-login:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-login.loading{opacity:.7}
+
+#errorBox{
+  display:none;margin-bottom:12px;padding:10px 12px;
+  background:#000;border:1.5px solid #ef4444;border-radius:10px;
+  color:#fca5a5;font-size:12px;font-weight:600;line-height:1.4;
+}
+#errorBox.show{display:block}
+
+.toast-wrap{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99;width:min(92vw,360px)}
+.toast{
+  background:#0d2137;border:1.5px solid #1a3a5c;border-radius:12px;
+  padding:12px 14px;margin-bottom:8px;color:#e5e7eb;font-size:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  animation:up .3s ease both;
+}
+.toast.error{border-color:#ef4444}
+.toast.success{border-color:#22c55e}
+.toast.hide{opacity:0;transition:opacity .3s}
+
+.footer{
+  text-align:center;font-size:11px;color:#6b7280;letter-spacing:1px;margin-top:4px;
+}
+.footer b{color:#60a5fa}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="wrap">
+  <div class="hero">
+    <img src="sasuke.png" alt="DOXZXRAT" onerror="this.parentElement.style.display='none'">
+  </div>
+
+  <div class="card">
+    <div class="card-title">LOGIN</div>
+    <div class="card-sub">Masuk untuk lanjut ke panel control.<br>Gunakan akun dengan bijak.</div>
+
+    <div id="errorBox" role="alert"></div>
+
+    <div class="input-group">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+      <input type="text" id="username" placeholder="Username" autocomplete="username">
+    </div>
+
+    <div class="input-group">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+      <button type="button" class="eye-btn" onclick="togglePwd()" aria-label="Toggle password">
+        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="save-row" id="saveToggle" onclick="toggleSave(event)">
+      <input type="checkbox" id="rememberMe">
+      <div class="save-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span class="save-label">SIMPAN</span>
+    </div>
+
+    <button type="button" class="btn-login" id="loginBtn" onclick="doLogin()">MASUK</button>
+  </div>
+
+  <div class="footer">DOXZXRAT · by <b>@doxzon01</b></div>
+</div>
+
+<script>
+(function(){
+  var remember = localStorage.getItem('sync_remember') === '1';
+  var token = localStorage.getItem('sync_token');
+  if (remember && token) {
+    window.location.replace('splash.html');
+  }
+})();
+
+function toggleSave(e) {
+  if (e && e.target && e.target.id === 'rememberMe') return;
+  var cb = document.getElementById('rememberMe');
+  cb.checked = !cb.checked;
+  document.getElementById('saveToggle').classList.toggle('on', cb.checked);
+}
+
+function loadSavedCreds() {
+  var saved = localStorage.getItem('sync_saved_creds');
+  if (saved) {
+    try {
+      var data = JSON.parse(atob(saved));
+      document.getElementById('username').value = data.username || '';
+      document.getElementById('password').value = data.password || '';
+    } catch(e){}
+  }
+  if (localStorage.getItem('sync_remember') === '1') {
+    document.getElementById('rememberMe').checked = true;
+    document.getElementById('saveToggle').classList.add('on');
+  }
+}
+
+function togglePwd() {
+  var inp = document.getElementById('password');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+  } else {
+    inp.type = 'password';
+  }
+}
+
+function showToast(type, title, msg) {
+  var wrap = document.getElementById('toastWrap');
+  var t = document.createElement('div');
+  t.className = 'toast ' + (type || '');
+  t.innerHTML = '<b>' + (title||'') + '</b><div style="margin-top:4px;opacity:.9">' + (msg||'') + '</div>';
+  wrap.appendChild(t);
+  var box = document.getElementById('errorBox');
+  if (type === 'error') {
+    box.textContent = (title ? title + ' — ' : '') + (msg || '');
+    box.classList.add('show');
+  } else {
+    box.classList.remove('show');
+    box.textContent = '';
+  }
+  setTimeout(function(){
+    t.classList.add('hide');
+    setTimeout(function(){ t.remove(); }, 300);
+  }, type === 'error' ? 6000 : 3000);
+}
+
+async function doLogin() {
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value;
+  var remember = document.getElementById('rememberMe').checked;
+  var btn = document.getElementById('loginBtn');
+
+  if (!username || !password) {
+    showToast('error', 'Gagal Masuk', 'Username dan password tidak boleh kosong');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    var deviceId = localStorage.getItem('sync_device_id');
+    if (!deviceId) {
+      deviceId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem('sync_device_id', deviceId);
+    }
+
+    var res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, password: password, deviceId: deviceId })
+    });
+    var data = await res.json();
+
+    if (data.ok) {
+      localStorage.setItem('sync_token', data.token);
+      localStorage.setItem('sync_user', data.username || username);
+      if (data.role) localStorage.setItem('sync_role', data.role);
+      if (data.uid) localStorage.setItem('sync_uid', data.uid);
+      try {
+        localStorage.setItem('sync_user_obj', JSON.stringify({
+          username: data.username || username,
+          role: data.role || '',
+          uid: data.uid || '',
+          displayName: data.displayName || data.username || username
+        }));
+      } catch(e){}
+
+      if (remember) {
+        localStorage.setItem('sync_remember', '1');
+        localStorage.setItem('sync_saved_creds', btoa(JSON.stringify({ username: username, password: password })));
+      } else {
+        localStorage.removeItem('sync_remember');
+        localStorage.removeItem('sync_saved_creds');
+      }
+
+      window.location.href = 'splash.html';
+    } else {
+      showToast('error', 'Gagal Masuk', data.error || 'Username atau password salah');
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      document.getElementById('password').value = '';
+      document.getElementById('password').focus();
+    }
+  } catch (err) {
+    showToast('error', 'Koneksi Gagal', 'Tidak bisa konek ke server');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+document.getElementById('username').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('password').focus();
+});
+document.getElementById('password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+loadSavedCreds();
+if (!document.getElementById('username').value) {
+  document.getElementById('username').focus();
+}
+</script>
+</body>
+</html>
