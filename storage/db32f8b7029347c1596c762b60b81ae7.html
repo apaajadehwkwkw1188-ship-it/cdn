@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Kontrol Grup Telegram</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+      body {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #229ED9 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 900px;
+        background: rgba(255,255,255,0.98);
+        border-radius: 20px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #229ED9, #1c7db0);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .header .logo {
+        width: 50px; height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 26px;
+      }
+
+      .header h1 { font-size: 22px; }
+      .header p { font-size: 13px; opacity: 0.9; margin-top: 3px; }
+
+      .status {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.2);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 13px;
+      }
+
+      .dot {
+        width: 10px; height: 10px;
+        background: #4ade80;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74,222,128,0.7); }
+        50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+      }
+
+      .content { padding: 30px; }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+      }
+
+      .card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 20px;
+        transition: all 0.3s;
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(34,158,217,0.15);
+        border-color: #229ED9;
+      }
+
+      .card h3 {
+        font-size: 15px;
+        color: #1e293b;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .stat {
+        font-size: 28px;
+        font-weight: 700;
+        color: #229ED9;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 4px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        color: #475569;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: white;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #229ED9;
+        box-shadow: 0 0 0 4px rgba(34,158,217,0.1);
+      }
+
+      .form-group textarea { resize: vertical; min-height: 90px; }
+
+      .btn {
+        background: linear-gradient(135deg, #229ED9, #1c7db0);
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(34,158,217,0.4);
+      }
+
+      .btn:active { transform: translateY(0); }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+      }
+      .btn-danger:hover { box-shadow: 0 10px 20px rgba(239,68,68,0.4); }
+
+      .btn-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+      }
+
+      .btn-full { width: 100%; justify-content: center; }
+
+      .btn-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 25px 0 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .log {
+        background: #0f172a;
+        color: #4ade80;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        padding: 15px;
+        border-radius: 10px;
+        max-height: 180px;
+        overflow-y: auto;
+        line-height: 1.7;
+      }
+
+      .log .time { color: #64748b; }
+      .log .msg { color: #e2e8f0; }
+
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #1e293b;
+        color: white;
+        padding: 15px 22px;
+        border-radius: 12px;
+        font-size: 14px;
+        transform: translateX(400px);
+        transition: transform 0.4s;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        z-index: 999;
+      }
+
+      .toast.show { transform: translateX(0); }
+
+      @media (max-width: 600px) {
+        .header { flex-wrap: wrap; }
+        .status { margin-left: 0; width: 100%; justify-content: center; }
+        .content { padding: 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">✈️</div>
+        <div>
+          <h1>Panel Kontrol Grup Telegram</h1>
+          <p>Bot Management Dashboard v1.0</p>
+        </div>
+        <div class="status">
+          <div class="dot"></div>
+          <span>Bot Aktif</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- Statistik -->
+        <div class="grid">
+          <div class="card">
+            <h3>👥 Total Anggota</h3>
+            <div class="stat" id="totalMembers">1,248</div>
+            <div class="stat-label">+12 hari ini</div>
+          </div>
+          <div class="card">
+            <h3>💬 Pesan Hari Ini</h3>
+            <div class="stat" id="totalMessages">3,521</div>
+            <div class="stat-label">Rata-rata 146/jam</div>
+          </div>
+          <div class="card">
+            <h3>🚫 Diblokir</h3>
+            <div class="stat" id="totalBanned">27</div>
+            <div class="stat-label">7 hari terakhir</div>
+          </div>
+        </div>
+
+        <!-- Kirim Pesan -->
+        <div class="section-title">📢 Kirim Pesan ke Grup</div>
+        <div class="form-group">
+          <label>ID Grup / Chat ID</label>
+          <input type="text" id="chatId" placeholder="Contoh: -1001234567890" />
+        </div>
+        <div class="form-group">
+          <label>Isi Pesan</label>
+          <textarea id="message" placeholder="Tulis pesan yang ingin dikirim..."></textarea>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="sendMessage()">
+            <span>📤</span>
+            Kirim Pesan
+          </button>
+          <button class="btn btn-warning" onclick="sendMessage(true)">
+            <span>📌</span>
+            Kirim &amp; Pin
+          </button>
+        </div>
+
+        <!-- Moderasi -->
+        <div class="section-title">🛡️ Moderasi Anggota</div>
+        <div class="grid">
+          <div class="card">
+            <h3>🚫 Ban Pengguna</h3>
+            <div class="form-group">
+              <input type="text" id="banUser" placeholder="Username / User ID" />
+            </div>
+            <button class="btn btn-danger btn-full" onclick="banUser()">Ban Pengguna</button>
+          </div>
+          <div class="card">
+            <h3>🔇 Mute Pengguna</h3>
+            <div class="form-group">
+              <input type="text" id="muteUser" placeholder="Username / User ID" />
+            </div>
+            <button class="btn btn-warning btn-full" onclick="muteUser()">Mute Pengguna</button>
+          </div>
+          <div class="card">
+            <h3>✅ Unban Pengguna</h3>
+            <div class="form-group">
+              <input type="text" id="unbanUser" placeholder="Username / User ID" />
+            </div>
+            <button class="btn btn-full" onclick="unbanUser()">Unban</button>
+          </div>
+        </div>
+
+        <!-- Pengaturan Bot -->
+        <div class="section-title">⚙️ Pengaturan Bot</div>
+        <div class="grid">
+          <div class="card">
+            <h3>🤖 Anti-Spam</h3>
+            <select id="antiSpam">
+              <option value="on">Aktif</option>
+              <option value="off">Nonaktif</option>
+            </select>
+            <br />
+            <br />
+            <button class="btn btn-full" onclick="updateSetting('Anti-Spam', 'antiSpam')">Simpan</button>
+          </div>
+          <div class="card">
+            <h3>👋 Welcome Message</h3>
+            <select id="welcome">
+              <option value="on">Aktif</option>
+              <option value="off">Nonaktif</option>
+            </select>
+            <br />
+            <br />
+            <button class="btn btn-full" onclick="updateSetting('Welcome', 'welcome')">Simpan</button>
+          </div>
+          <div class="card">
+            <h3>🔒 Mode Grup</h3>
+            <select id="groupMode">
+              <option value="public">Publik</option>
+              <option value="private">Privat</option>
+            </select>
+            <br />
+            <br />
+            <button class="btn btn-full" onclick="updateSetting('Mode Grup', 'groupMode')">Simpan</button>
+          </div>
+        </div>
+
+        <!-- Log Aktivitas -->
+        <div class="section-title">📊 Log Aktivitas</div>
+        <div class="log" id="log">
+          <div>
+            <span class="time">[--:--:--]</span>
+            <span class="msg">Menunggu perintah...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      // ====== KONFIGURASI BOT ======
+      const BOT_TOKEN = 'ISI_TOKEN_BOT_ANDA_DISINI'; // Ganti dengan token bot dari @BotFather
+      const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+      // ====== UTILITAS ======
+      function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      }
+
+      function addLog(message) {
+        const log = document.getElementById('log');
+        const time = new Date().toLocaleTimeString('id-ID');
+        const line = document.createElement('div');
+        line.innerHTML = `<span class="time">[${time}]</span> <span class="msg">${message}</span>`;
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      // ====== KIRIM PESAN ======
+      async function sendMessage(pin = false) {
+        const chatId = document.getElementById('chatId').value.trim();
+        const text = document.getElementById('message').value.trim();
+
+        if (!chatId || !text) {
+          showToast('❌ Isi Chat ID dan pesan terlebih dahulu!');
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_URL}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+          });
+          const data = await res.json();
+
+          if (data.ok) {
+            addLog(`✅ Pesan terkirim ke ${chatId}`);
+            showToast('✅ Pesan berhasil dikirim!');
+
+            if (pin) {
+              await fetch(`${API_URL}/pinChatMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, message_id: data.result.message_id })
+              });
+              addLog(`📌 Pesan di-pin`);
+            }
+            document.getElementById('message').value = '';
+          } else {
+            addLog(`❌ Gagal: ${data.description}`);
+            showToast('❌ Gagal: ' + data.description);
+          }
+        } catch (e) {
+          addLog(`⚠️ Error: ${e.message}`);
+          showToast('⚠️ Error koneksi ke API');
+        }
+      }
+
+      // ====== BAN ======
+      async function banUser() {
+        const chatId = document.getElementById('chatId').value.trim();
+        const userId = document.getElementById('banUser').value.trim();
+        if (!chatId || !userId) return showToast('❌ Isi Chat ID dan User ID!');
+
+        try {
+          const res = await fetch(`${API_URL}/banChatMember`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, user_id: userId })
+          });
+          const data = await res.json();
+          if (data.ok) {
+            addLog(`🚫 Pengguna ${userId} dibanned`);
+            showToast('🚫 Pengguna dibanned!');
+          } else showToast('❌ ' + data.description);
+        } catch (e) { showToast('⚠️ Error: ' + e.message); }
+      }
+
+      // ====== UNBAN ======
+      async function unbanUser() {
+        const chatId = document.getElementById('chatId').value.trim();
+        const userId = document.getElementById('unbanUser').value.trim();
+        if (!chatId || !userId) return showToast('❌ Isi Chat ID dan User ID!');
+
+        try {
+          const res = await fetch(`${API_URL}/unbanChatMember`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, user_id: userId, only_if_banned: true })
+          });
+          const data = await res.json();
+          if (data.ok) {
+            addLog(`✅ Pengguna ${userId} di-unban`);
+            showToast('✅ Pengguna di-unban!');
+          } else showToast('❌ ' + data.description);
+        } catch (e) { showToast('⚠️ Error: ' + e.message); }
+      }
+
+      // ====== MUTE ======
+      async function muteUser() {
+        const chatId = document.getElementById('chatId').value.trim();
+        const userId = document.getElementById('muteUser').value.trim();
+        if (!chatId || !userId) return showToast('❌ Isi Chat ID dan User ID!');
+
+        const untilDate = Math.floor(Date.now() / 1000) + 3600; // 1 jam
+        try {
+          const res = await fetch(`${API_URL}/restrictChatMember`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              user_id: userId,
+              permissions: { can_send_messages: false },
+              until_date: untilDate
+            })
+          });
+          const data = await res.json();
+          if (data.ok) {
+            addLog(`🔇 Pengguna ${userId} di-mute 1 jam`);
+            showToast('🔇 Pengguna di-mute!');
+          } else showToast('❌ ' + data.description);
+        } catch (e) { showToast('⚠️ Error: ' + e.message); }
+      }
+
+      // ====== PENGATURAN ======
+      function updateSetting(nama, elementId) {
+        const val = document.getElementById(elementId).value;
+        addLog(`⚙️ ${nama} diubah ke: ${val}`);
+        showToast(`✅ ${nama} disimpan!`);
+      }
+
+      // Inisialisasi
+      addLog('🚀 Dashboard siap digunakan');
+      addLog('ℹ️ Jangan lupa isi BOT_TOKEN di dalam kode');
+    </script>
+  </body>
+</html>
