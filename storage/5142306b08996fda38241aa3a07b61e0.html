@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berita BGN</title>
+  <style>
+    :root {
+      --bg: #111113;
+      --card: #1c1c20;
+      --card-hover: #222225;
+      --border: #2a2a32;
+      --input-border: rgba(39, 39, 45, 0.6);
+      --btn: #29292e;
+      --btn-hover: #313138;
+      --btn-border: #33333a;
+      --modal: #202025;
+      --modal-border: #35353e;
+      --chip-bg: #2c2b30;
+      --chip-ink: #c2c1c7;
+      --muted: #8e8d93;
+      --text: #ececee;
+      --title: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1100px; margin: auto; padding: 24px 16px 36px; }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .brand img {
+      height: 34px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    h1 { margin: 0; font-size: 22px; color: var(--title); letter-spacing: -0.02em; }
+
+    a, input, button, dialog { outline: none; font: inherit; }
+    a:focus, a:focus-visible,
+    button:focus, button:focus-visible,
+    #cari:focus, #cari:focus-visible, #cari:active {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    #cari {
+      width: 100%;
+      max-width: 360px;
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--title);
+      font-size: 14px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    #cari::placeholder { color: #64646c; }
+    #cari:focus { border-color: var(--input-border); }
+    #cari::-webkit-search-cancel-button { display: none; }
+
+    button {
+      height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--btn-border);
+      border-radius: 8px;
+      background: var(--btn);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: var(--btn-hover); }
+
+    #daftar-berita-bgn {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover { background: var(--card-hover); }
+
+    .thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #1a1a1d;
+    }
+    .img-spinner {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #1a1a1d;
+      z-index: 1;
+    }
+    .img-spinner img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      animation: spin 1s linear infinite;
+    }
+    .thumb > img.card-img {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.05);
+      opacity: 0;
+    }
+    .thumb > img.card-img.loaded {
+      opacity: 1;
+    }
+
+    .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+    .chip {
+      background: var(--chip-bg);
+      color: var(--chip-ink);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .card h3 { margin: 0; font-size: 15px; line-height: 1.4; color: var(--title); }
+
+    .loader {
+      grid-column: 1/-1;
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+    }
+    .loader img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Pesan status: ukuran, warna, dan posisi tengah yang seragam */
+    .msg {
+      grid-column: 1/-1;
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 16px;
+      font-size: 15px;
+      margin: 0;
+    }
+
+    dialog {
+      width: min(680px, calc(100% - 24px));
+      max-height: 85vh;
+      background: var(--modal);
+      color: var(--text);
+      border: 1px solid var(--modal-border);
+      border-radius: 0;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.6);
+    }
+    dialog[open] {
+      display: flex;
+      flex-direction: column;
+    }
+    dialog::backdrop { background: rgba(0,0,0,.72); }
+    .modal-head {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+      background: var(--modal);
+      padding: 14px 18px;
+      border-bottom: 1px solid #2f2f35;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-head a {
+      color: var(--chip-ink);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .modal-head a:active,
+    .modal-head a:focus {
+      color: var(--chip-ink) !important;
+      opacity: 1 !important;
+    }
+    .modal-head a:hover {
+      color: var(--title);
+    }
+
+    .modal-body {
+      padding: 20px 22px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .cover-wrap {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #2f2f35;
+      margin-bottom: 14px;
+      background: #1a1a1d;
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+    }
+    .cover-wrap img.cover-img {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: block;
+      transform: scale(1.05);
+      opacity: 0;
+    }
+    .cover-wrap img.cover-img.loaded {
+      opacity: 1;
+    }
+
+    .modal-body h2 { margin: 0 0 10px; font-size: 20px; line-height: 1.3; color: var(--title); }
+    .modal-body p { margin: 0 0 12px; color: var(--text); font-size: 15px; line-height: 1.65; }
+
+    .credit {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div id="brand" class="brand" title="Kembali ke awal">
+        <img src="https://i.ibb.co.com/TqLwbSPX/logo-bgn-1.png" alt="Logo BGN" referrerpolicy="no-referrer" />
+        <h1>Berita BGN</h1>
+      </div>
+      <input id="cari" type="text" placeholder="Cari berita..." autocomplete="off" />
+    </header>
+
+    <div id="daftar-berita-bgn">
+      <div class="loader"><img src="https://i.ibb.co.com/nsCXRQZh/loading.png" alt="Memuat" /></div>
+    </div>
+
+    <footer id="credit" class="credit">By Master Aaron</footer>
+  </div>
+
+  <dialog id="reader">
+    <div class="modal-head">
+      <a id="reader-link" href="#" target="_blank" rel="noopener noreferrer">Buka di bgn.go.id ↗</a>
+      <button id="reader-close" type="button">Tutup</button>
+    </div>
+    <div id="reader-body" class="modal-body"></div>
+  </dialog>
+
+  <script>
+    const PROXY = 'https://cors-anywhere.herokuapp.com/';
+    const SOURCES = [
+      ['Berita', 'https://www.bgn.go.id/news/berita/'],
+      ['Siaran Pers', 'https://www.bgn.go.id/news/siaran-pers/'],
+      ['Pengumuman', 'https://www.bgn.go.id/news/pengumuman/']
+    ];
+    const SPINNER_SRC = 'https://i.ibb.co.com/nsCXRQZh/loading.png';
+    const LOADER_HTML = `<div class="loader"><img src="${SPINNER_SRC}" alt="Memuat" /></div>`;
+    const MONTHS = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,agu:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
+
+    const brandEl = document.getElementById('brand');
+    const listEl = document.getElementById('daftar-berita-bgn');
+    const searchEl = document.getElementById('cari');
+    const creditEl = document.getElementById('credit');
+    const reader = document.getElementById('reader');
+    const readerBody = document.getElementById('reader-body');
+    const readerLink = document.getElementById('reader-link');
+
+    let items = [];
+
+    const esc = (s = '') => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const abs = (u = '', base) => {
+      try {
+        const res = new URL(u, base).href;
+        return /^https?:\/\//i.test(res) ? res : '';
+      } catch { return ''; }
+    };
+    const toTime = (d = '') => {
+      const m = d.toLowerCase().match(/(\d{1,2})\s+([a-z]{3})[a-z]*\s+(\d{4})/);
+      return m && m[2] in MONTHS ? new Date(+m[3], MONTHS[m[2]], +m[1]).getTime() : 0;
+    };
+
+    window.onImgLoaded = function(img) {
+      img.classList.add('loaded');
+      const spinner = img.previousElementSibling;
+      if (spinner && spinner.classList.contains('img-spinner')) {
+        spinner.remove();
+      }
+    };
+
+    async function fetchHtml(url) {
+      const res = await fetch(PROXY + url);
+      if (res.status === 403 || !res.ok) throw new Error('System sedang error');
+      return new DOMParser().parseFromString(await res.text(), 'text/html');
+    }
+
+    function parseList(doc, baseUrl, fallbackCat) {
+      const map = new Map();
+      doc.querySelectorAll('a').forEach(a => {
+        const h3 = a.querySelector('h3');
+        const href = a.getAttribute('href');
+        if (!h3 || !href || href === '#') return;
+
+        const url = abs(href, baseUrl);
+        if (!url || map.has(url)) return;
+
+        const ps = [...(h3.nextElementSibling?.querySelectorAll('p') || a.querySelectorAll('p'))]
+          .map(p => p.textContent.trim())
+          .filter(Boolean);
+
+        const img = a.querySelector('img');
+        map.set(url, {
+          url,
+          title: h3.textContent.trim(),
+          image: abs(img?.getAttribute('src') || img?.dataset?.src || '', baseUrl),
+          source: ps[0] || 'BGN',
+          category: ps[1] || fallbackCat,
+          date: ps[2] || ''
+        });
+      });
+      return [...map.values()].slice(2);
+    }
+
+    function buildCards() {
+      if (!items.length) {
+        listEl.innerHTML = '<p class="msg">Berita tidak ditemukan.</p>';
+        creditEl.style.display = 'none';
+        return;
+      }
+
+      listEl.innerHTML = items.map((x, i) => `
+        <article class="card" data-i="${i}">
+          ${x.image ? `
+            <div class="thumb">
+              <div class="img-spinner"><img src="${SPINNER_SRC}" alt="Memuat gambar" /></div>
+              <img
+                class="card-img"
+                src="${esc(x.image)}"
+                alt="${esc(x.title)}"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+                onload="onImgLoaded(this)"
+                onerror="this.parentElement.remove()"
+              />
+            </div>
+          ` : ''}
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="chip">${esc(x.source)}</span>
+              <span>${esc(x.category)}${x.date ? ' · ' + esc(x.date) : ''}</span>
+            </div>
+            <h3>${esc(x.title)}</h3>
+          </div>
+        </article>
+      `).join('') + '<p id="empty-msg" class="msg" style="display:none;">Berita tidak ditemukan.</p>';
+
+      creditEl.style.display = 'block';
+    }
+
+    function filterCards() {
+      const q = searchEl.value.trim().toLowerCase();
+      const cards = listEl.querySelectorAll('.card');
+      const emptyMsg = document.getElementById('empty-msg');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const item = items[card.dataset.i];
+        const match = !q ||
+          item.title.toLowerCase().includes(q) ||
+          item.category.toLowerCase().includes(q);
+
+        card.style.display = match ? 'flex' : 'none';
+        if (match) visibleCount++;
+      });
+
+      if (emptyMsg) {
+        emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+      creditEl.style.display = visibleCount === 0 ? 'none' : 'block';
+    }
+
+    function resetToHome() {
+      if (searchEl.value !== '') {
+        searchEl.value = '';
+        filterCards();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function load() {
+      creditEl.style.display = 'none';
+      listEl.innerHTML = LOADER_HTML;
+      try {
+        const results = await Promise.allSettled(
+          SOURCES.map(async ([cat, url]) => parseList(await fetchHtml(url), url, cat))
+        );
+        const merged = new Map();
+        let firstErr = null;
+
+        results.forEach(r => {
+          if (r.status === 'fulfilled') {
+            r.value.forEach(x => { if (!merged.has(x.url)) merged.set(x.url, x); });
+          } else if (!firstErr) {
+            firstErr = r.reason;
+          }
+        });
+
+        if (!merged.size && firstErr) throw firstErr;
+
+        items = [...merged.values()].sort((a, b) => toTime(b.date) - toTime(a.date));
+        buildCards();
+      } catch (e) {
+        listEl.innerHTML = '<p class="msg">System sedang error</p>';
+        creditEl.style.display = 'none';
+      }
+    }
+
+    listEl.addEventListener('click', async (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      const item = items[card.dataset.i];
+      readerLink.href = item.url;
+      readerBody.innerHTML = LOADER_HTML;
+      reader.showModal();
+
+      try {
+        const doc = await fetchHtml(item.url);
+        const main = doc.querySelector('article, main') || doc.body;
+        const paras = [...main.querySelectorAll('p')].map(p => p.textContent.trim()).filter(t => t.length > 30);
+
+        if (!paras.length) {
+          readerBody.innerHTML = '<p class="msg">Isi error</p>';
+          return;
+        }
+
+        readerBody.innerHTML = `
+          ${item.image ? `
+            <div class="cover-wrap">
+              <div class="img-spinner"><img src="${SPINNER_SRC}" alt="Memuat gambar" /></div>
+              <img
+                class="cover-img"
+                src="${esc(item.image)}"
+                alt="${esc(item.title)}"
+                referrerpolicy="no-referrer"
+                onload="onImgLoaded(this)"
+                onerror="this.parentElement.remove()"
+              />
+            </div>
+          ` : ''}
+          <h2>${esc(item.title)}</h2>
+          <p class="card-meta"><span class="chip">${esc(item.source)}</span><span>${esc(item.category)}${item.date ? ' · ' + esc(item.date) : ''}</span></p>
+          ${paras.map(p => `<p>${esc(p)}</p>`).join('')}
+        `;
+      } catch (err) {
+        readerBody.innerHTML = '<p class="msg">Isi error</p>';
+      }
+    });
+
+    brandEl.addEventListener('click', resetToHome);
+    searchEl.addEventListener('input', filterCards);
+    document.getElementById('reader-close').addEventListener('click', () => reader.close());
+    reader.addEventListener('click', e => { if (e.target === reader) reader.close(); });
+
+    load();
+  </script>
+</body>
+</html>
